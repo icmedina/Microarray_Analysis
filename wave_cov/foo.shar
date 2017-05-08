@@ -1,0 +1,9523 @@
+#!/bin/sh
+# This is a shell archive (produced by GNU shar 4.0).
+# To extract the files from this archive, save it to some FILE, remove
+# everything before the `!/bin/sh' line above, then type `sh FILE'.
+#
+# Made on 1999-05-25 17:16 MDT by <whitcher@euridice>.
+# Source directory was `/home/whitcher/Research/Gencay'.
+#
+# Existing files will *not* be overwritten unless `-c' is specified.
+#
+# This shar contains:
+# length mode       name
+# ------ ---------- ------------------------------------------
+#   8078 -rwxr-xr-x mexopts.sh
+#   1453 -rw-r--r-- dwt.c
+#   1542 -rw-r--r-- idwt.c
+#   1591 -rw-r--r-- modwt.c
+#   1477 -rw-r--r-- imodwt.c
+#   1256 -rw-r--r-- dwt_dbp.m
+#    947 -rw-r--r-- modwt_brick_wall.m
+#   1352 -rw-r--r-- modwt_dbp.m
+#    221 -rw-r--r-- myACF.m
+#    177 -rw-r--r-- myCCF.m
+#   1969 -rw-r--r-- myfilter.m
+#   1068 -rw-r--r-- wave_cor.m
+#   1234 -rw-r--r-- wave_cov.m
+#   1249 -rw-r--r-- wave_cross_cor.m
+#   1143 -rw-r--r-- wave_cross_cov.m
+#   1110 -rw-r--r-- wave_var.m
+#  22410 -rw-r--r-- ir.dat
+#  23175 -rw-r--r-- wire.dat
+#   4501 -rw-r--r-- wavecov.mlab
+#
+touch -am 1231235999 $$.touch >/dev/null 2>&1
+if test ! -f 1231235999 && test -f $$.touch; then
+  shar_touch=touch
+else
+  shar_touch=:
+  echo 'WARNING: not restoring timestamps'
+fi
+rm -f 1231235999 $$.touch
+#
+# ============= mexopts.sh ==============
+if test -f 'mexopts.sh' && test X"$1" != X"-c"; then
+  echo 'x - skipping mexopts.sh (File already exists)'
+else
+  echo 'x - extracting mexopts.sh (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'mexopts.sh' &&
+#
+# mexopts.sh   Shell script for configuring MEX-file creation script,
+#               mex.
+#
+# usage:        Do not call this file directly; it is sourced by the
+#               mex shell script.  Modify only if you don't like the
+#               defaults after running mex.  No spaces are allowed
+#               around the '=' in the variable assignment.
+#
+# SELECTION_TAGs occur in template option files and are used by MATLAB
+# tools, such as mex and mbuild, to determine the purpose of the contents
+# of an option file. These tags are only interpreted when preceded by '#'
+# and followed by ':'.
+#
+#SELECTION_TAG_MEX_OPT: Template Options file for building MEXfiles using the native compiler
+#
+# Copyright (c) 1984-1998 by The MathWorks, Inc.
+# All Rights Reserved.
+# $Revision: 1.40 $  $Date: 1997/12/05 20:18:39 $
+#----------------------------------------------------------------------------
+#
+X    case "$Arch" in
+X        Undetermined)
+#----------------------------------------------------------------------------
+# Change this line if you need to specify the location of the MATLAB
+# root directory.  The cmex script needs to know where to find utility
+# routines so that it can determine the architecture; therefore, this
+# assignment needs to be done while the architecture is still
+# undetermined.
+#----------------------------------------------------------------------------
+X            MATLAB="$MATLAB"
+X            ;;
+X        alpha)
+#----------------------------------------------------------------------------
+X            CC='cc'
+X            CFLAGS='-ieee -std1'
+X            CLIBS=''
+X            COPTIMFLAGS='-O2 -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS='-shared'
+X            FLIBS='-lUfor -lfor -lFutil'
+X            FOPTIMFLAGS='-O2'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='ld'
+X            LDFLAGS="-expect_unresolved '*' -shared -hidden -exported_symbol $ENTRYPOINT -exported_symbol mexVersion"
+X            LDOPTIMFLAGS=''
+X            LDDEBUGFLAGS=''
+#----------------------------------------------------------------------------
+X            ;;
+X        hp700)
+#----------------------------------------------------------------------------
+X            CC='cc'
+X            CFLAGS='+z -D_HPUX_SOURCE -Aa +DA1.1'
+X            CLIBS=''
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS='+z +DA1.1'
+X            FLIBS=''
+X            FOPTIMFLAGS='-O'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='ld'
+X            LDFLAGS="-b +e $ENTRYPOINT +e mexVersion"
+X            LDOPTIMFLAGS=''
+X            LDDEBUGFLAGS=''
+#----------------------------------------------------------------------------
+X            ;;
+X        ibm_rs)
+#----------------------------------------------------------------------------
+X            CC='cc'
+X            CFLAGS='-qlanglvl=ansi'
+X            CLIBS='-lm'
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS=''
+X            FLIBS="$MATLAB/extern/lib/ibm_rs/fmex1.o -lm"
+X            FOPTIMFLAGS='-O'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='cc'
+X            LDFLAGS="-bI:$MATLAB/extern/lib/ibm_rs/exp.ibm_rs -bE:$MATLAB/extern/lib/ibm_rs/$MAPFILE -bM:SRE -e $ENTRYPOINT"
+X            LDOPTIMFLAGS='-s'
+X            LDDEBUGFLAGS=''
+#----------------------------------------------------------------------------
+X            ;;
+X        lnx86)
+#----------------------------------------------------------------------------
+X            CC='gcc'
+X            CFLAGS=''
+X            CLIBS=''
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+# Use these flags for using f2c and gcc for Fortan MEX-Files
+#
+X            FC='f2c'
+X            FOPTIMFLAGS=''
+X            FFLAGS=''
+X            FDEBUGFLAGS='-g'
+X            FLIBS='-lf2c -Wl,--defsym,MAIN__=mexfunction_'
+#
+# Use these flags for using the Absoft F77 Fortran Compiler
+#
+X        #   FC='f77'
+X        #   FOPTIMFLAGS=''
+X        #   FFLAGS='-f -N1 -N9 -N70'
+X        #   FDEBUGFLAGS='-gg'
+X        #   FLIBS='-lf77'
+#
+X            LD='gcc'
+X            LDFLAGS='-shared -rdynamic'
+X            LDOPTIMFLAGS=''
+X            LDDEBUGFLAGS=''
+#----------------------------------------------------------------------------
+X            ;;
+X        sgi)
+#----------------------------------------------------------------------------
+X            CC='cc'
+X            CFLAGS='-ansi -mips2'
+X            CLIBS=''
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS=''
+X            FLIBS=''
+X            FOPTIMFLAGS='-O'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='ld'
+X            LDFLAGS="-shared -U -Bsymbolic -exported_symbol $ENTRYPOINT -exported_symbol mexVersion"
+X            LDOPTIMFLAGS=''
+X            LDDEBUGFLAGS=''
+X            ;;
+#----------------------------------------------------------------------------
+X        sgi64)
+# R8000 only: The default action of mex is to generate full MIPS IV
+#             (R8000) instruction set.
+#----------------------------------------------------------------------------
+X            CC='cc'
+X            CFLAGS='-ansi -mips4 -64'
+X            CLIBS='-lm'
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS='-mips4 -64'
+X            FLIBS=''
+X            FOPTIMFLAGS='-O'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='ld'
+X            LDFLAGS="-mips4 -64 -shared -U -Bsymbolic -exported_symbol $ENTRYPOINT -exported_symbol mexVersion"
+X            LDOPTIMFLAGS=''
+X            LDDEBUGFLAGS=''
+X            ;;
+#----------------------------------------------------------------------------
+X        sol2)
+#----------------------------------------------------------------------------
+X            CC='cc'
+X            CFLAGS='-dalign'
+X            CLIBS=''
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS='-dalign'
+X            FLIBS=''
+X            FOPTIMFLAGS='-O'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='/usr/ccs/bin/ld'
+X            LDFLAGS="-G -M $MATLAB/extern/lib/sol2/$MAPFILE"
+X            LDOPTIMFLAGS=''
+X            LDDEBUGFLAGS=''
+#----------------------------------------------------------------------------
+X            ;;
+X        sun4)
+#----------------------------------------------------------------------------
+# A dry run of the appropriate compiler is done in the mex script to
+# generate the correct library list. Use -v option to see what
+# libraries are actually being linked in.
+#----------------------------------------------------------------------------
+X            CC='acc'
+X            CFLAGS='-DMEXSUN4'
+X            CLIBS="$MATLAB/extern/lib/sun4/libmex.a -lm"
+X            COPTIMFLAGS='-O -DNDEBUG'
+X            CDEBUGFLAGS='-g'
+#
+X            FC='f77'
+X            FFLAGS=''
+X            FLIBS="$MATLAB/extern/lib/sun4/libmex.a -lm"
+X            FOPTIMFLAGS='-O'
+X            FDEBUGFLAGS='-g'
+#
+X            LD='ld'
+X            LDFLAGS='-d -r -u _mex_entry_pt -u _mexFunction'
+X            LDOPTIMFLAGS='-x'
+X            LDDEBUGFLAGS=''
+#----------------------------------------------------------------------------
+X            ;;
+X    esac
+#############################################################################
+#
+# Architecture independent lines:
+#
+#     Set and uncomment any lines which will apply to all architectures.
+#
+#----------------------------------------------------------------------------
+#           CC="$CC"
+#           CFLAGS="$CFLAGS"
+#           COPTIMFLAGS="$COPTIMFLAGS"
+#           CDEBUGFLAGS="$CDEBUGFLAGS"
+#           CLIBS="$CLIBS"
+#
+#           FC="$FC"
+#           FFLAGS="$FFLAGS"
+#           FOPTIMFLAGS="$FOPTIMFLAGS"
+#           FDEBUGFLAGS="$FDEBUGFLAGS"
+#           FLIBS="$FLIBS"
+#
+#           LD="$LD"
+#           LDFLAGS="$LDFLAGS"
+#           LDOPTIMFLAGS="$LDOPTIMFLAGS"
+#           LDDEBUGFLAGS="$LDDEBUGFLAGS"
+#----------------------------------------------------------------------------
+#############################################################################
+SHAR_EOF
+  $shar_touch -am 0519173699 'mexopts.sh' &&
+  chmod 0755 'mexopts.sh' ||
+  echo 'restore of mexopts.sh failed'
+  shar_count="`wc -c < 'mexopts.sh'`"
+  test 8078 -eq "$shar_count" ||
+    echo "mexopts.sh: original size 8078, current size $shar_count"
+fi
+# ============= dwt.c ==============
+if test -f 'dwt.c' && test X"$1" != X"-c"; then
+  echo 'x - skipping dwt.c (File already exists)'
+else
+  echo 'x - extracting dwt.c (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'dwt.c' &&
+#include "mex.h"
+X
+/* mex -v -f /usr/tuelocal/matlab-5.2/bin/mexopts.sh dwt.c */
+X
+void dwt(double *Vin, int *M, int *L, double *h, double *g, 
+X         double *Wout, double *Vout)
+{
+X
+X  long n, t, u;
+X
+X  for(t = 0; t < *M/2; t++) {
+X    u = 2 * t + 1;
+X    Wout[t] = h[0] * Vin[u];
+X    Vout[t] = g[0] * Vin[u];
+X    for(n = 1; n < *L; n++) {
+X      u -= 1;
+X      if(u < 0) u = *M - 1;
+X      Wout[t] += h[n] * Vin[u];
+X      Vout[t] += g[n] * Vin[u];
+X    } 
+X  }
+}
+X
+void mexFunction(int nlhs, mxArray *plhs[], 
+X                int nrhs, const mxArray *prhs[])
+{
+X  int M, L;
+X  int m, n;
+X  double *Wout, *Vout;
+X  double *Vin, *h, *g;
+X  
+X  /* Check for proper number of arguments */
+X  
+X  if (nrhs != 3) {
+X    mexErrMsgTxt("DWT requires three input arguments.");
+X  } else if (nlhs > 2) {
+X    mexErrMsgTxt("DWT requires two output arguments.");
+X  }
+X  
+X  Vin = mxGetPr(prhs[0]);
+X  h = mxGetPr(prhs[1]);
+X  g = mxGetPr(prhs[2]);
+X
+X  m = mxGetM(prhs[0]);
+X  mexPrintf("m = %d\n", m);
+X  n = mxGetN(prhs[0]);
+X  mexPrintf("n = %d\n", n);
+X  
+X  /* Create matrices for the return arguments */
+X  
+X  plhs[0] = mxCreateDoubleMatrix(m, n/2, mxREAL);
+X  plhs[1] = mxCreateDoubleMatrix(m, n/2, mxREAL);
+X  
+X  /* Assign pointers to the various parameters */
+X  
+X  Wout = mxGetPr(plhs[0]);
+X  Vout = mxGetPr(plhs[1]);
+X  
+X  M = mxGetNumberOfElements(prhs[0]);
+X  L = mxGetNumberOfElements(prhs[1]);
+X  
+X  /* Do the actual computations in a subroutine */
+X  
+X  dwt(Vin, &M, &L, h, g, Wout, Vout);
+X  return;
+}
+X
+SHAR_EOF
+  $shar_touch -am 0519161899 'dwt.c' &&
+  chmod 0644 'dwt.c' ||
+  echo 'restore of dwt.c failed'
+  shar_count="`wc -c < 'dwt.c'`"
+  test 1453 -eq "$shar_count" ||
+    echo "dwt.c: original size 1453, current size $shar_count"
+fi
+# ============= idwt.c ==============
+if test -f 'idwt.c' && test X"$1" != X"-c"; then
+  echo 'x - skipping idwt.c (File already exists)'
+else
+  echo 'x - extracting idwt.c (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'idwt.c' &&
+#include "mex.h"
+X
+/* mex -v -f /usr/tuelocal/matlab-5.2/bin/mexopts.sh dwt.c */
+X
+void idwt(double *Win, double *Vin, int *M, int *L, double *h, double *g, 
+X         double *Xout)
+{
+X
+X  int i, j, l, t, u;
+X  int m = -2, n = -1;
+X
+X  for(t = 0; t < *M; t++) {
+X    m += 2;
+X    n += 2;
+X    u = t;
+X    i = 1;
+X    j = 0;
+X    Xout[m] = h[i] * Win[u] + g[i] * Vin[u];
+X    Xout[n] = h[j] * Win[u] + g[j] * Vin[u];
+X    if(*L > 2) {
+X      for(l = 1; l < *L/2; l++) {
+X       u += 1;
+X       if(u > *M) u = 0;
+X       i += 2;
+X       j += 2;
+X       Xout[m] += h[i] * Win[u] + g[i] * Vin[u];
+X       Xout[n] += h[j] * Win[u] + g[j] * Vin[u];
+X      }
+X    }
+X  }
+}
+X
+void mexFunction(int nlhs, mxArray *plhs[], 
+X                int nrhs, const mxArray *prhs[])
+{
+X  int M, L;
+X  int m, n;
+X  double *Xout;
+X  double *Win, *Vin, *h, *g;
+X  
+X  /* Check for proper number of arguments */
+X  
+X  if (nrhs != 4) {
+X    mexErrMsgTxt("DWT requires four input arguments.");
+X  } else if (nlhs > 1) {
+X    mexErrMsgTxt("DWT requires one output argument.");
+X  }
+X  
+X  Win = mxGetPr(prhs[0]);
+X  Vin = mxGetPr(prhs[1]);
+X  h = mxGetPr(prhs[2]);
+X  g = mxGetPr(prhs[3]);
+X
+X  m = mxGetM(prhs[0]);
+X  mexPrintf("m = %d\n", m);
+X  n = mxGetN(prhs[0]);
+X  mexPrintf("n = %d\n", n);
+X  
+X  /* Create matrices for the return arguments */
+X  
+X  plhs[0] = mxCreateDoubleMatrix(m, 2*n, mxREAL);
+X  
+X  /* Assign pointers to the various parameters */
+X  
+X  Xout = mxGetPr(plhs[0]);
+X  
+X  M = mxGetNumberOfElements(prhs[0]);
+X  L = mxGetNumberOfElements(prhs[2]);
+X  
+X  /* Do the actual computations in a subroutine */
+X  
+X  idwt(Win, Vin, &M, &L, h, g, Xout);
+X  return;
+}
+X
+SHAR_EOF
+  $shar_touch -am 0519180699 'idwt.c' &&
+  chmod 0644 'idwt.c' ||
+  echo 'restore of idwt.c failed'
+  shar_count="`wc -c < 'idwt.c'`"
+  test 1542 -eq "$shar_count" ||
+    echo "idwt.c: original size 1542, current size $shar_count"
+fi
+# ============= modwt.c ==============
+if test -f 'modwt.c' && test X"$1" != X"-c"; then
+  echo 'x - skipping modwt.c (File already exists)'
+else
+  echo 'x - extracting modwt.c (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'modwt.c' &&
+#include "mex.h"
+#include "math.h"
+X
+/* mex -v -f /usr/tuelocal/matlab-5.2/bin/mexopts.sh modwt.c */
+X
+void modwt(double *Vin, int *N, int *j, int *L, double *ht, double *gt, 
+X          double *Wout, double *Vout)
+{
+X
+X  int k, n, t;
+X
+X  for(t = 0; t < *N; t++) {
+X    k = t;
+X    Wout[t] = ht[0] * Vin[k];
+X    Vout[t] = gt[0] * Vin[k];
+X    for(n = 1; n < *L; n++) {
+X      k -= (int) pow(2.0, (double) *j - 1.0);
+X      if(k < 0) k += *N;
+X      Wout[t] += ht[n] * Vin[k];
+X      Vout[t] += gt[n] * Vin[k];
+X    }
+X  }
+X
+}
+X
+void mexFunction(int nlhs, mxArray *plhs[], 
+X                int nrhs, const mxArray *prhs[])
+{
+X  int M, J, L;
+X  int m, n;
+X  double *Wout, *Vout;
+X  double *Vin, *ht, *gt;
+X  
+X  /* Check for proper number of arguments */
+X  
+X  if (nrhs != 4) {
+X    mexErrMsgTxt("DWT requires four input arguments.");
+X  } else if (nlhs > 2) {
+X    mexErrMsgTxt("DWT requires two output arguments.");
+X  }
+X  
+X  Vin = mxGetPr(prhs[0]);
+X  ht = mxGetPr(prhs[1]);
+X  gt = mxGetPr(prhs[2]);
+X  J = (int) mxGetScalar(prhs[3]);
+X  /* mexPrintf("J = %d\n", J); */
+X
+X  m = mxGetM(prhs[0]);
+X  /* mexPrintf("m = %d\n", m); */
+X  n = mxGetN(prhs[0]);
+X  /* mexPrintf("n = %d\n", n); */
+X  
+X  /* Create matrices for the return arguments */
+X  
+X  plhs[0] = mxCreateDoubleMatrix(m, n, mxREAL);
+X  plhs[1] = mxCreateDoubleMatrix(m, n, mxREAL);
+X  
+X  /* Assign pointers to the various parameters */
+X  
+X  Wout = mxGetPr(plhs[0]);
+X  Vout = mxGetPr(plhs[1]);
+X  
+X  M = mxGetNumberOfElements(prhs[0]);
+X  L = mxGetNumberOfElements(prhs[1]);
+X  
+X  /* Do the actual computations in a subroutine */
+X  
+X  modwt(Vin, &M, &J, &L, ht, gt, Wout, Vout);
+X  return;
+}
+SHAR_EOF
+  $shar_touch -am 0520161999 'modwt.c' &&
+  chmod 0644 'modwt.c' ||
+  echo 'restore of modwt.c failed'
+  shar_count="`wc -c < 'modwt.c'`"
+  test 1591 -eq "$shar_count" ||
+    echo "modwt.c: original size 1591, current size $shar_count"
+fi
+# ============= imodwt.c ==============
+if test -f 'imodwt.c' && test X"$1" != X"-c"; then
+  echo 'x - skipping imodwt.c (File already exists)'
+else
+  echo 'x - extracting imodwt.c (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'imodwt.c' &&
+#include "mex.h"
+#include "math.h"
+X
+/* mex -v -f ./mexopts.sh imodwt.c */
+X
+void imodwt(double *Win, double *Vin, int *N, int *j, int *L, 
+X           double *ht, double *gt, double *Vout)
+{
+X
+X  int k, n, t;
+X
+X  for(t = 0; t < *N; t++) {
+X    k = t;
+X    Vout[t] = (ht[0] * Win[k]) + (gt[0] * Vin[k]);
+X    for(n = 1; n < *L; n++) {
+X      k += (int) pow(2.0, (double) *j - 1.0);
+X      if(k >= *N) k -= *N;
+X      Vout[t] += (ht[n] * Win[k]) + (gt[n] * Vin[k]);
+X    }
+X  }
+}
+X
+void mexFunction(int nlhs, mxArray *plhs[], 
+X                int nrhs, const mxArray *prhs[])
+{
+X  int N, J, L;
+X  int m, n;
+X  double *Vout;
+X  double *Win, *Vin, *ht, *gt;
+X  
+X  /* Check for proper number of arguments */
+X  
+X  if (nrhs != 5) {
+X    mexErrMsgTxt("DWT requires five input arguments.");
+X  } else if (nlhs > 1) {
+X    mexErrMsgTxt("DWT requires one output argument.");
+X  }
+X  
+X  Win = mxGetPr(prhs[0]);
+X  Vin = mxGetPr(prhs[1]);
+X  ht = mxGetPr(prhs[2]);
+X  gt = mxGetPr(prhs[3]);
+X  J = (int) mxGetScalar(prhs[4]);
+X  mexPrintf("J = %d\n", J);
+X
+X  m = mxGetM(prhs[0]);
+X  mexPrintf("m = %d\n", m);
+X  n = mxGetN(prhs[0]);
+X  mexPrintf("n = %d\n", n);
+X  
+X  /* Create matrices for the return arguments */
+X  
+X  plhs[0] = mxCreateDoubleMatrix(m, n, mxREAL);
+X  
+X  /* Assign pointers to the various parameters */
+X  
+X  Vout = mxGetPr(plhs[0]);
+X  
+X  N = mxGetNumberOfElements(prhs[0]);
+X  L = mxGetNumberOfElements(prhs[2]);
+X  
+X  /* Do the actual computations in a subroutine */
+X  
+X  imodwt(Win, Vin, &N, &J, &L, ht, gt, Vout);
+X  return;
+}
+SHAR_EOF
+  $shar_touch -am 0519220299 'imodwt.c' &&
+  chmod 0644 'imodwt.c' ||
+  echo 'restore of imodwt.c failed'
+  shar_count="`wc -c < 'imodwt.c'`"
+  test 1477 -eq "$shar_count" ||
+    echo "imodwt.c: original size 1477, current size $shar_count"
+fi
+# ============= dwt_dbp.m ==============
+if test -f 'dwt_dbp.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping dwt_dbp.m (File already exists)'
+else
+  echo 'x - extracting dwt_dbp.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'dwt_dbp.m' &&
+function [C, L] = dwt_dbp(X, wavelet, nlevels, boundary)
+%%
+%% Purpose:  Compute the (partial) discrete wavelet transform
+%% -------------------------------------------------------------------------
+%% Reference: Percival and Walden (1999).  Wavelet Methods for Time Series
+%%            Analysis.  Cambridge University Press, Cambridge.
+%%
+%% Input: X         Vector of observations
+%%        wavelet   Character string; 'haar', 'd4', 'la8', 'la16'
+%%        nlevels   Level of partial DWT
+%%        boundary  Character string; 'periodic' or 'reflection'
+%%
+%% Output : C  Matrix of DWT wavelet coefficients (padded with NaNs to
+%%             retain proper dimension)
+%%          L  Vector containing number of wavelet coefficients for each 
+%%             level
+%%
+N = length(X);
+J = nlevels;
+X
+switch boundary
+X  case 'reflection'
+X    X = [X fliplr(X)];
+X    N = length(X);
+X  case 'periodic'
+X    ;
+X  otherwise
+X    error('Invalid boundary rule in dwt_dbp');
+end
+X
+if log2(N) ~= floor(log2(N))
+X  error('Sample size is not a power of 2');
+end
+X
+if 2.^J > N
+X  error('Wavelet transform exceeds sample size in DWT');
+end
+X
+[h, g, l] = myfilter(wavelet);
+X
+C = []; L = [];
+for j = 1:J
+X  [W, V] = dwt(X, h, g);
+X  C = [W C];
+X  L = [N/2.^j L];
+X  X = V; 
+end
+C = [V C];
+SHAR_EOF
+  $shar_touch -am 0525170799 'dwt_dbp.m' &&
+  chmod 0644 'dwt_dbp.m' ||
+  echo 'restore of dwt_dbp.m failed'
+  shar_count="`wc -c < 'dwt_dbp.m'`"
+  test 1256 -eq "$shar_count" ||
+    echo "dwt_dbp.m: original size 1256, current size $shar_count"
+fi
+# ============= modwt_brick_wall.m ==============
+if test -f 'modwt_brick_wall.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping modwt_brick_wall.m (File already exists)'
+else
+  echo 'x - extracting modwt_brick_wall.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'modwt_brick_wall.m' &&
+function C = modwt_brick_wall(X, wavelet, N)
+%%
+%% Purpose:  Sets the first N_j coefficients to NaN, for j = 1,...,J.
+%% -------------------------------------------------------------------------
+%% Reference: Lindsay et al. (1996).  The Discrete Wavelet Transform
+%%            and the Scale Anlaysis of the Surface Properties of Sea
+%%            Ice.  IEEE Trans. on Geo. and Rem. Sen., 34(3), pp. 
+%%            771-787.
+%%
+%% Input: X        Matrix containing wavelet coefficients with appropriate 
+%%                 boundary condition
+%%        wavelet  Character string; 'haar', 'd4', 'la8', 'la16'
+%%        N        Length of original vector of observations
+%%
+%% Output: C  Matrix containing wavelet coefficients where ones affected
+%%            by boundary conditions are replaced with NaNs
+%%
+[h, g, l] = myfilter(wavelet);
+[I, J] = size(X);
+X
+C = X;
+for j = 1:(J-1)
+X  n = (2.^j - 1) * (l - 1);
+X  C(1:n,j) = NaN;
+end
+C(1:n,j+1) = NaN;
+SHAR_EOF
+  $shar_touch -am 0525171099 'modwt_brick_wall.m' &&
+  chmod 0644 'modwt_brick_wall.m' ||
+  echo 'restore of modwt_brick_wall.m failed'
+  shar_count="`wc -c < 'modwt_brick_wall.m'`"
+  test 947 -eq "$shar_count" ||
+    echo "modwt_brick_wall.m: original size 947, current size $shar_count"
+fi
+# ============= modwt_dbp.m ==============
+if test -f 'modwt_dbp.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping modwt_dbp.m (File already exists)'
+else
+  echo 'x - extracting modwt_dbp.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'modwt_dbp.m' &&
+function C = modwt_dbp(X, wavelet, nlevels, boundary)
+%%
+%% Purpose:  Compute the (partial) maximal overlap discrete wavelet 
+%%           transform
+%% -------------------------------------------------------------------------
+%% Reference: Percival and Guttorp (1994).  Long-memory processes, the 
+%%            Allan variance and wavelets.  In "Wavelets and Geophysics,"
+%%            pages 325-344.  Academic Press, Inc, San Diego.
+%%            Percival and Mofjeld (1997).  Analysis of Subtidal Coastal 
+%%            Sea Level Fluctuations Using Wavelets.  Journal of the 
+%%            American Statistical Association 92, pp. 868-880.
+%%
+%% Input: X         Vector of observations
+%%        wavelet   Character string; 'haar', 'd4', 'la8', 'la16'
+%%        nlevels   Level of partial MODWT
+%%        boundary  Character string; 'periodic' or 'reflection'
+%%
+%% Output : C  Matrix of MODWT wavelet coefficients
+%%
+N = length(X);
+J = nlevels;
+X
+switch boundary
+X  case 'reflection'
+X    X = [X fliplr(X)];
+X    N = length(X);
+X  case 'periodic'
+X    ;
+X  otherwise
+X    error('Invalid boundary rule in dwt_dbp');
+end
+X
+if 2.^J > N
+X  error('Wavelet transform exceeds sample size in DWT');
+end
+X
+[h, g, l] = myfilter(wavelet);
+X
+ht = h ./ sqrt(2);
+gt = g ./ sqrt(2);
+X
+C = [];
+for j = 1:J
+X  [W, V] = modwt(X, ht, gt, j);
+X  C = [C W'];
+X  X = V; 
+end
+C = [C V'];
+SHAR_EOF
+  $shar_touch -am 0525170899 'modwt_dbp.m' &&
+  chmod 0644 'modwt_dbp.m' ||
+  echo 'restore of modwt_dbp.m failed'
+  shar_count="`wc -c < 'modwt_dbp.m'`"
+  test 1352 -eq "$shar_count" ||
+    echo "modwt_dbp.m: original size 1352, current size $shar_count"
+fi
+# ============= myACF.m ==============
+if test -f 'myACF.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping myACF.m (File already exists)'
+else
+  echo 'x - extracting myACF.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'myACF.m' &&
+function A = myACF(V)
+%%
+%% Provides all N-1 autocovariance estimates from a vector of observations
+%%
+N = length(V);
+A = xcov(V(~isnan(V)), 'biased')';
+NV = sum(~isnan(V));
+A = [repmat(NaN, 1, N-NV+1) A(NV:(2*(NV-1)))];
+SHAR_EOF
+  $shar_touch -am 0525171199 'myACF.m' &&
+  chmod 0644 'myACF.m' ||
+  echo 'restore of myACF.m failed'
+  shar_count="`wc -c < 'myACF.m'`"
+  test 221 -eq "$shar_count" ||
+    echo "myACF.m: original size 221, current size $shar_count"
+fi
+# ============= myCCF.m ==============
+if test -f 'myCCF.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping myCCF.m (File already exists)'
+else
+  echo 'x - extracting myCCF.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'myCCF.m' &&
+function A = myCCF(U, V)
+%%
+%% Provides all N-1 autocovariance estimates from a vector of observations
+%%
+N = length(U);
+A = sum(xcov(U(~isnan(U)), V(~isnan(V)), 'biased').^2);
+SHAR_EOF
+  $shar_touch -am 0525171199 'myCCF.m' &&
+  chmod 0644 'myCCF.m' ||
+  echo 'restore of myCCF.m failed'
+  shar_count="`wc -c < 'myCCF.m'`"
+  test 177 -eq "$shar_count" ||
+    echo "myCCF.m: original size 177, current size $shar_count"
+fi
+# ============= myfilter.m ==============
+if test -f 'myfilter.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping myfilter.m (File already exists)'
+else
+  echo 'x - extracting myfilter.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'myfilter.m' &&
+function [h, g, L] = myfilter(name)
+%%
+%% Define high-pass and low-pass filter coefficients of length (L)
+%% ------------------------------------------------------------------------
+%% Input: name  Character string; 'haar', 'd4', 'la8', 'la16'
+%%
+%% Output: h  Vector of high-pass filter coefficients
+%%         g  Vector of low-pass filter coefficients
+%%         L  Length of filter coefficients
+%%
+switch name
+X  case 'haar' 
+X    L = 2;
+X    h = [0.7071067811865475 -0.7071067811865475];
+X    g = [0.7071067811865475 0.7071067811865475];
+X  case 'd4' 
+X    L = 4;
+X    h = [-0.1294095225512603 -0.2241438680420134 0.8365163037378077 ...
+X          -0.4829629131445341];
+X    g = [0.4829629131445341 0.8365163037378077 0.2241438680420134 ...
+X         -0.1294095225512603];
+X  case 'la8' 
+X    L = 8;
+X    h = [0.03222310060407815 0.01260396726226383 -0.09921954357695636 ...
+X         -0.29785779560560505 0.80373875180538600 -0.49761866763256290 ...
+X         -0.02963552764596039 0.07576571478935668];
+X    g = [-0.07576571478935668 -0.02963552764596039 0.49761866763256290 ...
+X          0.80373875180538600 0.29785779560560505 -0.09921954357695636 ...
+X          -0.01260396726226383 0.03222310060407815];
+X  case 'la16' 
+X    L = 16;
+X    h = [0.0018899503329007 0.0003029205145516 -0.0149522583367926 ...
+X         -0.0038087520140601 0.0491371796734768 0.0272190299168137 ...
+X         -0.0519458381078751 -0.3644418948359564 0.7771857516997478 ...
+X         -0.4813596512592012 -0.0612733590679088 0.1432942383510542 ...
+X         0.0076074873252848 -0.0316950878103452 -0.0005421323316355 ...
+X         0.0033824159513594];
+X    g = [-0.0033824159513594 -0.0005421323316355 0.0316950878103452 ...
+X          0.0076074873252848 -0.1432942383510542 -0.0612733590679088 ...
+X          0.4813596512592012 0.7771857516997478 0.3644418948359564 ...
+X          -0.0519458381078751 -0.0272190299168137 0.0491371796734768 ...
+X          0.0038087520140601 -0.0149522583367926 -0.0003029205145516 ...
+X          0.0018899503329007];
+X  otherwise
+X    error('Invalid selection for myfilter');
+end
+SHAR_EOF
+  $shar_touch -am 0525171399 'myfilter.m' &&
+  chmod 0644 'myfilter.m' ||
+  echo 'restore of myfilter.m failed'
+  shar_count="`wc -c < 'myfilter.m'`"
+  test 1969 -eq "$shar_count" ||
+    echo "myfilter.m: original size 1969, current size $shar_count"
+fi
+# ============= wave_cor.m ==============
+if test -f 'wave_cor.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping wave_cor.m (File already exists)'
+else
+  echo 'x - extracting wave_cor.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wave_cor.m' &&
+function C = wave_cor(X, Y)
+%%
+%% Compute wavelet correlation with approximate 95% confidence interval
+%% -----------------------------------------------------------------------
+%% Input: X  Matrix containing wavelet coefficients with appropriate 
+%%           boundary condition
+%%        Y  Matrix containing wavelet coefficients with appropriate 
+%%           boundary condition
+%%
+%% Output: C  Matrix containing the wavelet correlation (column 1), lower 
+%%            95% quantile for confidence interval, upper 95% quantile 
+%%            for confidence interval
+%%
+[I, J] = size(X);
+X
+XXY = X .* Y;
+SSX = []; SSY = []; SSXY = [];
+for j = 1:J
+X  XNaN = X(~isnan(X(:,j)),j)';
+X  SSX = [SSX sum(XNaN.^2)];
+X  YNaN = Y(~isnan(Y(:,j)),j)';
+X  SSY = [SSY sum(YNaN.^2)];
+X  XYNaN = XY(~isnan(XY(:,j)),j)';
+X  SSXY = [SSXY sum(XYNaN)];
+end
+NX = sum(~isnan(X),1);
+COR = (SSXY./NX) ./ (sqrt(SSX./NX) .* sqrt(SSY./NX));
+X
+NDWT = floor(I ./ 2.^(1:J));
+X
+C = [COR; tanh(atanh(COR) - norminv(0.975) ./ sqrt(NDWT-3)); 
+X             tanh(atanh(COR) + norminv(0.975) ./ sqrt(NDWT-3))]';
+SHAR_EOF
+  $shar_touch -am 0525171499 'wave_cor.m' &&
+  chmod 0644 'wave_cor.m' ||
+  echo 'restore of wave_cor.m failed'
+  shar_count="`wc -c < 'wave_cor.m'`"
+  test 1068 -eq "$shar_count" ||
+    echo "wave_cor.m: original size 1068, current size $shar_count"
+fi
+# ============= wave_cov.m ==============
+if test -f 'wave_cov.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping wave_cov.m (File already exists)'
+else
+  echo 'x - extracting wave_cov.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wave_cov.m' &&
+function C = wave_cov(X, Y)
+%%
+%% Compute wavelet covariance with approximate 95% confidence interval
+%% -----------------------------------------------------------------------
+%% Input: X  Matrix containing wavelet coefficients with appropriate 
+%%           boundary condition
+%%        Y  Matrix containing wavelet coefficients with appropriate 
+%%           boundary condition
+%%
+%% Output: C  Matrix containing the wavelet covariance (column 1), lower 
+%%            95% quantile for confidence interval, upper 95% quantile 
+%%            for confidence interval
+%%
+[I, J] = size(X);
+XXY = X .* Y;
+SSXY = [];
+for j = 1:J
+X  XYNaN = XY(~isnan(XY(:,j)),j)';
+X  SSXY = [SSXY sum(XYNaN)];
+end
+NX = sum(~isnan(X),1);
+Z = SSXY ./ NX;
+X
+XXACF = []; YACF = []; SUMXYCCF = [];
+for j = 1:J
+X  XACF = [XACF; myACF(X(:,j))];
+X  YACF = [YACF; myACF(Y(:,j))];
+X  SUMXYCCF = [SUMXYCCF; myCCF(X(:,j),Y(:,j))];
+end
+XXACF = XACF'; YACF = YACF'; SUMXYCCF = SUMXYCCF';
+X
+AA = [];
+for j = 1:J
+X  XACFNaN = XACF(~isnan(XACF(:,j)),j)';
+X  YACFNaN = YACF(~isnan(YACF(:,j)),j)';
+X  A = sum(XACFNaN .* YACFNaN) + SUMXYCCF(j);
+X  AA = [AA A];
+end
+X
+VARgamma = AA ./ (2 .* NX);
+C = [Z; Z - norminv(0.975) .* sqrt(VARgamma);
+X        Z + norminv(0.975) .* sqrt(VARgamma)]';
+SHAR_EOF
+  $shar_touch -am 0525165799 'wave_cov.m' &&
+  chmod 0644 'wave_cov.m' ||
+  echo 'restore of wave_cov.m failed'
+  shar_count="`wc -c < 'wave_cov.m'`"
+  test 1234 -eq "$shar_count" ||
+    echo "wave_cov.m: original size 1234, current size $shar_count"
+fi
+# ============= wave_cross_cor.m ==============
+if test -f 'wave_cross_cor.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping wave_cross_cor.m (File already exists)'
+else
+  echo 'x - extracting wave_cross_cor.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wave_cross_cor.m' &&
+function [C, L] = wave_cross_cov(X, Y, LMAX)
+%%
+%% Compute wavelet cross-correlations for arbitrary lag
+%% -----------------------------------------------------------------------
+%% Input: X     Matrix containing wavelet coefficients with appropriate 
+%%              boundary condition
+%%        Y     Matrix containing wavelet coefficients with appropriate 
+%%              boundary condition
+%%        LMAX  Maximum lag to compute
+%%
+%% Output: C  Matrix containing the wavelet cross-correlation (same 
+%%            number of columns as X and Y)
+%%         L  Vector of lags (for plotting)
+%%
+[I J] = size(X);
+L = (-LMAX+1):(LMAX-1);
+X
+XXYCrossCov = []; C = [];
+for j = 1:J
+X  XNaN = X(~isnan(X(:,j)),j)';
+X  ZNaN = XNaN;
+X  YNaN = Y(~isnan(Y(:,j)),j)';
+X  NX = length(XNaN);
+X  NXX = min(length(XNaN) - 1, LMAX);
+X  XNaNVar = mean(XNaN.^2);
+X  YNaNVar = mean(YNaN.^2);
+X
+X  LAG1 = []; LAG2 = [];
+X  for i = 1:NXX
+X    XYNaN = XNaN .* YNaN;
+X    ZYNaN = ZNaN .* YNaN;
+X    LAG1 = [LAG1 sum(XYNaN(~isnan(XYNaN))) / sqrt(XNaNVar * YNaNVar) / NX];
+X    LAG2 = [LAG2 sum(ZYNaN(~isnan(ZYNaN))) / sqrt(XNaNVar * YNaNVar) / NX];
+X    XNaN = [XNaN(2:NX) NaN];
+X    ZNaN = [NaN ZNaN(1:(NX-1))];
+X  end
+X  XYCrossCov = [fliplr(LAG2) LAG1(2:LMAX)];
+X  C = [C XYCrossCov'];
+end
+SHAR_EOF
+  $shar_touch -am 0525170099 'wave_cross_cor.m' &&
+  chmod 0644 'wave_cross_cor.m' ||
+  echo 'restore of wave_cross_cor.m failed'
+  shar_count="`wc -c < 'wave_cross_cor.m'`"
+  test 1249 -eq "$shar_count" ||
+    echo "wave_cross_cor.m: original size 1249, current size $shar_count"
+fi
+# ============= wave_cross_cov.m ==============
+if test -f 'wave_cross_cov.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping wave_cross_cov.m (File already exists)'
+else
+  echo 'x - extracting wave_cross_cov.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wave_cross_cov.m' &&
+function [C, L] = wave_cross_cov(X, Y, LMAX)
+%%
+%% Compute wavelet cross-covariances for arbitrary lag
+%% -----------------------------------------------------------------------
+%% Input: X     Matrix containing wavelet coefficients with appropriate 
+%%              boundary condition
+%%        Y     Matrix containing wavelet coefficients with appropriate 
+%%              boundary condition
+%%        LMAX  Maximum lag to compute
+%%
+%% Output: C  Matrix containing the wavelet cross-covariance (same 
+%%            number of columns as X and Y)
+%%         L  Vector of lags (for plotting)
+%%
+[I J] = size(X);
+L = (-LMAX+1):(LMAX-1);
+X
+XXYCrossCov = []; C = [];
+for j = 1:J
+X  XNaN = X(~isnan(X(:,j)),j)';
+X  ZNaN = XNaN;
+X  YNaN = Y(~isnan(Y(:,j)),j)';
+X  NX = length(XNaN);
+X  NXX = min(length(XNaN) - 1, LMAX);
+X
+X  LAG1 = []; LAG2 = [];
+X  for i = 1:NXX
+X    XYNaN = XNaN .* YNaN;
+X    ZYNaN = ZNaN .* YNaN;
+X    LAG1 = [LAG1 sum(XYNaN(~isnan(XYNaN))) ./ NX];
+X    LAG2 = [LAG2 sum(ZYNaN(~isnan(ZYNaN))) ./ NX];
+X    XNaN = [XNaN(2:NX) NaN];
+X    ZNaN = [NaN ZNaN(1:(NX-1))];
+X  end
+X  XYCrossCov = [fliplr(LAG2) LAG1(2:LMAX)];
+X  C = [C XYCrossCov'];
+end
+SHAR_EOF
+  $shar_touch -am 0525170099 'wave_cross_cov.m' &&
+  chmod 0644 'wave_cross_cov.m' ||
+  echo 'restore of wave_cross_cov.m failed'
+  shar_count="`wc -c < 'wave_cross_cov.m'`"
+  test 1143 -eq "$shar_count" ||
+    echo "wave_cross_cov.m: original size 1143, current size $shar_count"
+fi
+# ============= wave_var.m ==============
+if test -f 'wave_var.m' && test X"$1" != X"-c"; then
+  echo 'x - skipping wave_var.m (File already exists)'
+else
+  echo 'x - extracting wave_var.m (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wave_var.m' &&
+function C = wave_var(X)
+%%
+%% Compute wavelet variance with approximate 95% confidence interval
+%% -----------------------------------------------------------------------
+%% Input: X  Matrix containing wavelet coefficients with appropriate 
+%%           boundary condition
+%%
+%% Output: C  Matrix containing the wavelet variance (column 1), lower 
+%%            95% quantile for confidence interval, upper 95% quantile 
+%%            for confidence interval
+%%
+[I, J] = size(X);
+SSX = [];
+for j = 1:J
+X  XNaN = X(~isnan(X(:,j)),j)';
+X  SSX = [SSX sum(XNaN.^2)];
+end
+NX = sum(~isnan(X),1);
+Y = SSX ./ NX;
+X
+%%% Computes the variance of the wavelet variance via Chapter 8.
+X
+ACF = [];
+for j = 1:J
+X  ACF = [ACF; myACF(X(:,j))];
+end
+ACF = ACF';
+AA = [];
+for j = 1:J
+X  ACFNaN = ACF(~isnan(ACF(:,j)),j)';
+X  A = sum(ACFNaN.^2) - ACFNaN(1).^2 ./ 2;
+X  AA = [AA A];
+end
+VARnu = 2 .* AA ./ I;
+C = [Y; Y - norminv(0.975) * sqrt(VARnu); Y + norminv(0.975) * sqrt(VARnu)]';
+X
+%%% Computes eta_3 from Chapter 8.
+X
+% ETA3 _ pmax(NX ./ 2.^(1:J), 1);
+% C = [Y; ETA3 .* Y ./ chi2inv(0.975, ETA3); ETA3 .* Y ./ chi2inv(0.025, ETA3)]';
+SHAR_EOF
+  $shar_touch -am 0525170299 'wave_var.m' &&
+  chmod 0644 'wave_var.m' ||
+  echo 'restore of wave_var.m failed'
+  shar_count="`wc -c < 'wave_var.m'`"
+  test 1110 -eq "$shar_count" ||
+    echo "wave_var.m: original size 1110, current size $shar_count"
+fi
+# ============= ir.dat ==============
+if test -f 'ir.dat' && test X"$1" != X"-c"; then
+  echo 'x - skipping ir.dat (File already exists)'
+else
+  echo 'x - extracting ir.dat (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'ir.dat' &&
+-0.37
+-0.35
+-0.33
+-0.34
+-0.31
+-0.3
+-0.3
+-0.29
+-0.28
+-0.26
+-0.26
+-0.25
+-0.24
+-0.25
+-0.24
+-0.26
+-0.26
+-0.26
+-0.26
+-0.26
+-0.26
+-0.25
+-0.25
+-0.24
+-0.25
+-0.26
+-0.24
+-0.25
+-0.23
+-0.23
+-0.24
+-0.26
+-0.26
+-0.27
+-0.26
+-0.25
+-0.22
+-0.19
+-0.18
+-0.15
+-0.11
+-0.08
+-0.06
+-0.03
+0.0
+0.01
+0.04
+0.05
+0.06
+0.07
+0.08
+0.1
+0.1
+0.13
+0.16
+0.17
+0.19
+0.22
+0.22
+0.23
+0.24
+0.24
+0.23
+0.22
+0.22
+0.25
+0.26
+0.27
+0.31
+0.32
+0.32
+0.34
+0.32
+0.33
+0.33
+0.32
+0.34
+0.34
+0.34
+0.35
+0.35
+0.35
+0.35
+0.34
+0.34
+0.33
+0.3
+0.31
+0.27
+0.25
+0.24
+0.22
+0.23
+0.25
+0.24
+0.26
+0.26
+0.26
+0.26
+0.25
+0.24
+0.23
+0.22
+0.22
+0.21
+0.22
+0.21
+0.2
+0.2
+0.19
+0.17
+0.16
+0.16
+0.15
+0.16
+0.16
+0.16
+0.15
+0.14
+0.13
+0.14
+0.11
+0.08
+0.05
+0.03
+0.03
+0.03
+0.04
+0.04
+0.05
+0.05
+0.05
+0.04
+0.03
+0.03
+0.05
+0.06
+0.04
+0.05
+0.03
+0.02
+-0.01
+-0.03
+-0.05
+-0.07
+-0.1
+-0.1
+-0.12
+-0.11
+-0.09
+-0.07
+-0.05
+-0.05
+-0.07
+-0.08
+-0.09
+-0.1
+-0.12
+-0.15
+-0.17
+-0.17
+-0.2
+-0.2
+-0.18
+-0.17
+-0.13
+-0.11
+-0.08
+-0.05
+-0.05
+-0.04
+-0.08
+-0.09
+-0.11
+-0.1
+-0.12
+-0.14
+-0.11
+-0.09
+-0.07
+-0.04
+-0.03
+0.0
+0.01
+0.0
+0.02
+0.02
+0.03
+0.04
+0.03
+0.04
+0.04
+0.04
+0.04
+0.04
+0.02
+0.03
+0.01
+0.01
+0.01
+0.01
+0.01
+0.02
+0.02
+0.02
+0.0
+-0.0
+-0.02
+-0.03
+-0.03
+-0.04
+-0.05
+-0.04
+-0.06
+-0.06
+-0.07
+-0.09
+-0.09
+-0.12
+-0.16
+-0.16
+-0.2
+-0.22
+-0.23
+-0.24
+-0.25
+-0.24
+-0.22
+-0.2
+-0.19
+-0.18
+-0.15
+-0.15
+-0.13
+-0.12
+-0.13
+-0.14
+-0.14
+-0.12
+-0.11
+-0.1
+-0.13
+-0.14
+-0.17
+-0.19
+-0.2
+-0.18
+-0.19
+-0.17
+-0.14
+-0.12
+-0.09
+-0.07
+-0.08
+-0.08
+-0.11
+-0.15
+-0.2
+-0.23
+-0.27
+-0.27
+-0.26
+-0.26
+-0.21
+-0.17
+-0.15
+-0.12
+-0.11
+-0.11
+-0.11
+-0.12
+-0.14
+-0.14
+-0.14
+-0.13
+-0.14
+-0.12
+-0.13
+-0.11
+-0.1
+-0.08
+-0.07
+-0.06
+-0.05
+-0.04
+-0.03
+0.02
+-0.02
+-0.01
+-0.02
+-0.03
+-0.04
+-0.04
+-0.06
+-0.07
+-0.09
+-0.09
+-0.07
+-0.03
+-0.02
+0.02
+0.03
+0.03
+0.04
+0.05
+0.05
+0.08
+0.08
+0.08
+0.1
+0.1
+0.09
+0.07
+0.06
+0.04
+0.03
+0.01
+-0.0
+-0.02
+-0.05
+-0.05
+-0.04
+-0.07
+-0.08
+-0.09
+-0.1
+-0.11
+-0.12
+-0.13
+-0.15
+-0.18
+-0.2
+-0.22
+-0.25
+-0.28
+-0.3
+-0.32
+-0.3
+-0.3
+-0.27
+-0.24
+-0.21
+-0.18
+-0.16
+-0.15
+-0.16
+-0.16
+-0.18
+-0.19
+-0.21
+-0.21
+-0.21
+-0.18
+-0.17
+-0.17
+-0.14
+-0.14
+-0.15
+-0.12
+-0.1
+-0.09
+-0.07
+-0.07
+-0.05
+-0.04
+-0.04
+-0.03
+-0.03
+-0.04
+-0.05
+-0.07
+-0.05
+-0.05
+-0.06
+-0.04
+-0.05
+-0.04
+-0.04
+-0.03
+-0.04
+-0.04
+-0.02
+-0.04
+-0.05
+-0.04
+-0.05
+-0.05
+-0.06
+-0.05
+-0.06
+-0.07
+-0.09
+-0.09
+-0.1
+-0.13
+-0.12
+-0.13
+-0.13
+-0.14
+-0.14
+-0.14
+-0.15
+-0.17
+-0.17
+-0.18
+-0.19
+-0.18
+-0.2
+-0.2
+-0.2
+-0.22
+-0.22
+-0.23
+-0.27
+-0.25
+-0.25
+-0.22
+-0.19
+-0.17
+-0.14
+-0.11
+-0.13
+-0.12
+-0.12
+-0.13
+-0.1
+-0.07
+-0.05
+-0.03
+-0.01
+0.0
+0.0
+0.02
+0.04
+0.02
+0.04
+0.07
+0.08
+0.11
+0.13
+0.15
+0.17
+0.16
+0.14
+0.1
+0.04
+-0.01
+-0.03
+-0.04
+-0.02
+0.03
+0.06
+0.11
+0.14
+0.17
+0.2
+0.21
+0.22
+0.23
+0.25
+0.25
+0.26
+0.25
+0.21
+0.2
+0.17
+0.16
+0.17
+0.19
+0.23
+0.25
+0.26
+0.27
+0.28
+0.28
+0.27
+0.28
+0.28
+0.28
+0.28
+0.27
+0.29
+0.29
+0.28
+0.29
+0.29
+0.3
+0.27
+0.26
+0.25
+0.22
+0.19
+0.17
+0.17
+0.15
+0.17
+0.17
+0.18
+0.19
+0.18
+0.18
+0.19
+0.19
+0.17
+0.16
+0.15
+0.15
+0.14
+0.14
+0.14
+0.13
+0.15
+0.17
+0.18
+0.2
+0.2
+0.2
+0.19
+0.17
+0.14
+0.15
+0.13
+0.1
+0.09
+0.1
+0.09
+0.1
+0.11
+0.1
+0.11
+0.13
+0.12
+0.12
+0.12
+0.09
+0.08
+0.04
+-0.0
+-0.03
+-0.05
+-0.09
+-0.11
+-0.11
+-0.13
+-0.14
+-0.11
+-0.12
+-0.12
+-0.13
+-0.15
+-0.16
+-0.17
+-0.17
+-0.18
+-0.17
+-0.17
+-0.17
+-0.16
+-0.16
+-0.17
+-0.15
+-0.17
+-0.21
+-0.21
+-0.25
+-0.29
+-0.32
+-0.35
+-0.35
+-0.35
+-0.34
+-0.33
+-0.32
+-0.32
+-0.32
+-0.31
+-0.31
+-0.34
+-0.33
+-0.33
+-0.35
+-0.34
+-0.34
+-0.36
+-0.35
+-0.35
+-0.36
+-0.34
+-0.35
+-0.35
+-0.33
+-0.35
+-0.35
+-0.36
+-0.39
+-0.41
+-0.42
+-0.44
+-0.42
+-0.4
+-0.4
+-0.39
+-0.38
+-0.39
+-0.39
+-0.42
+-0.43
+-0.46
+-0.47
+-0.49
+-0.49
+-0.48
+-0.46
+-0.44
+-0.41
+-0.36
+-0.37
+-0.39
+-0.41
+-0.43
+-0.42
+-0.43
+-0.42
+-0.46
+-0.5
+-0.49
+-0.46
+-0.43
+-0.39
+-0.36
+-0.33
+-0.33
+-0.33
+-0.34
+-0.34
+-0.35
+-0.36
+-0.38
+-0.38
+-0.4
+-0.39
+-0.39
+-0.39
+-0.36
+-0.33
+-0.3
+-0.27
+-0.22
+-0.21
+-0.19
+-0.15
+-0.15
+-0.16
+-0.17
+-0.2
+-0.22
+-0.22
+-0.25
+-0.25
+-0.26
+-0.25
+-0.24
+-0.22
+-0.17
+-0.12
+-0.06
+-0.03
+0.01
+0.03
+0.04
+0.05
+0.06
+0.07
+0.07
+0.07
+0.08
+0.08
+0.09
+0.1
+0.13
+0.14
+0.15
+0.16
+0.15
+0.17
+0.18
+0.18
+0.19
+0.21
+0.2
+0.21
+0.21
+0.18
+0.18
+0.17
+0.19
+0.21
+0.19
+0.19
+0.19
+0.19
+0.2
+0.2
+0.2
+0.22
+0.21
+0.2
+0.21
+0.19
+0.19
+0.19
+0.18
+0.19
+0.18
+0.17
+0.17
+0.17
+0.17
+0.16
+0.17
+0.17
+0.17
+0.17
+0.17
+0.18
+0.19
+0.19
+0.19
+0.18
+0.17
+0.16
+0.13
+0.11
+0.08
+0.06
+0.05
+0.04
+0.0
+0.01
+0.01
+0.03
+0.04
+0.06
+0.05
+0.07
+0.05
+0.05
+0.03
+0.01
+0.01
+-0.01
+-0.03
+-0.05
+-0.08
+-0.09
+-0.1
+-0.15
+-0.16
+-0.17
+-0.19
+-0.16
+-0.15
+-0.11
+-0.09
+-0.07
+-0.04
+-0.05
+-0.03
+-0.02
+-0.03
+-0.01
+0.0
+-0.0
+0.01
+0.02
+0.01
+0.01
+0.05
+0.02
+0.03
+0.03
+0.03
+0.05
+0.07
+0.09
+0.1
+0.11
+0.13
+0.15
+0.17
+0.19
+0.21
+0.21
+0.22
+0.23
+0.21
+0.21
+0.21
+0.19
+0.17
+0.17
+0.17
+0.21
+0.24
+0.27
+0.31
+0.3
+0.28
+0.29
+0.27
+0.29
+0.28
+0.26
+0.26
+0.25
+0.26
+0.29
+0.3
+0.33
+0.35
+0.36
+0.38
+0.4
+0.4
+0.4
+0.39
+0.39
+0.4
+0.4
+0.39
+0.37
+0.37
+0.34
+0.33
+0.32
+0.28
+0.25
+0.22
+0.21
+0.21
+0.2
+0.21
+0.21
+0.19
+0.17
+0.14
+0.13
+0.09
+0.06
+0.05
+0.08
+0.08
+0.09
+0.1
+0.09
+0.1
+0.09
+0.08
+0.06
+0.05
+0.05
+0.03
+0.02
+0.01
+-0.02
+-0.07
+-0.13
+-0.19
+-0.23
+-0.27
+-0.32
+-0.35
+-0.37
+-0.36
+-0.33
+-0.32
+-0.3
+-0.29
+-0.3
+-0.28
+-0.28
+-0.28
+-0.29
+-0.32
+-0.35
+-0.39
+-0.4
+-0.4
+-0.4
+-0.41
+-0.39
+-0.4
+-0.39
+-0.41
+-0.44
+-0.45
+-0.44
+-0.44
+-0.45
+-0.45
+-0.45
+-0.45
+-0.44
+-0.44
+-0.42
+-0.42
+-0.43
+-0.45
+-0.47
+-0.48
+-0.48
+-0.48
+-0.51
+-0.52
+-0.55
+-0.6
+-0.62
+-0.62
+-0.61
+-0.57
+-0.55
+-0.53
+-0.5
+-0.5
+-0.5
+-0.48
+-0.5
+-0.52
+-0.52
+-0.54
+-0.54
+-0.55
+-0.57
+-0.57
+-0.58
+-0.58
+-0.59
+-0.6
+-0.56
+-0.54
+-0.51
+-0.49
+-0.46
+-0.45
+-0.44
+-0.42
+-0.4
+-0.38
+-0.36
+-0.35
+-0.34
+-0.32
+-0.31
+-0.31
+-0.31
+-0.31
+-0.29
+-0.27
+-0.25
+-0.24
+-0.21
+-0.2
+-0.19
+-0.18
+-0.17
+-0.17
+-0.19
+-0.19
+-0.21
+-0.22
+-0.21
+-0.2
+-0.2
+-0.18
+-0.16
+-0.14
+-0.13
+-0.12
+-0.11
+-0.1
+-0.1
+-0.11
+-0.11
+-0.11
+-0.11
+-0.12
+-0.13
+-0.14
+-0.16
+-0.21
+-0.22
+-0.23
+-0.24
+-0.23
+-0.24
+-0.26
+-0.27
+-0.29
+-0.32
+-0.34
+-0.35
+-0.37
+-0.36
+-0.36
+-0.33
+-0.3
+-0.27
+-0.25
+-0.22
+-0.2
+-0.19
+-0.2
+-0.22
+-0.25
+-0.28
+-0.31
+-0.33
+-0.33
+-0.34
+-0.3
+-0.28
+-0.25
+-0.22
+-0.2
+-0.18
+-0.12
+-0.07
+-0.02
+0.03
+0.05
+0.09
+0.1
+0.12
+0.14
+0.16
+0.16
+0.17
+0.19
+0.2
+0.2
+0.21
+0.21
+0.23
+0.24
+0.26
+0.27
+0.29
+0.29
+0.3
+0.33
+0.35
+0.38
+0.41
+0.45
+0.48
+0.5
+0.53
+0.55
+0.56
+0.58
+0.59
+0.59
+0.59
+0.59
+0.6
+0.59
+0.6
+0.59
+0.59
+0.59
+0.61
+0.59
+0.59
+0.59
+0.58
+0.57
+0.53
+0.48
+0.43
+0.4
+0.37
+0.38
+0.38
+0.38
+0.42
+0.43
+0.43
+0.42
+0.43
+0.41
+0.39
+0.39
+0.38
+0.38
+0.38
+0.36
+0.35
+0.36
+0.34
+0.33
+0.33
+0.3
+0.3
+0.29
+0.28
+0.25
+0.26
+0.23
+0.22
+0.22
+0.21
+0.19
+0.2
+0.16
+0.16
+0.16
+0.14
+0.13
+0.13
+0.1
+0.11
+0.09
+0.1
+0.1
+0.09
+0.08
+0.08
+0.04
+0.02
+0.02
+-0.01
+-0.02
+-0.01
+-0.03
+-0.02
+-0.02
+-0.02
+-0.0
+-0.03
+-0.03
+-0.09
+-0.14
+-0.17
+-0.2
+-0.23
+-0.22
+-0.21
+-0.17
+-0.1
+-0.06
+-0.01
+0.05
+0.05
+0.06
+0.08
+0.08
+0.08
+0.05
+0.04
+0.0
+-0.02
+-0.06
+-0.08
+-0.11
+-0.13
+-0.15
+-0.15
+-0.14
+-0.13
+-0.13
+-0.14
+-0.16
+-0.16
+-0.16
+-0.16
+-0.17
+-0.19
+-0.25
+-0.29
+-0.3
+-0.31
+-0.3
+-0.26
+-0.27
+-0.27
+-0.25
+-0.26
+-0.25
+-0.24
+-0.25
+-0.26
+-0.26
+-0.27
+-0.27
+-0.26
+-0.26
+-0.25
+-0.24
+-0.25
+-0.26
+-0.26
+-0.26
+-0.28
+-0.28
+-0.27
+-0.26
+-0.25
+-0.27
+-0.25
+-0.25
+-0.25
+-0.25
+-0.26
+-0.25
+-0.25
+-0.26
+-0.26
+-0.28
+-0.32
+-0.35
+-0.38
+-0.38
+-0.38
+-0.38
+-0.37
+-0.36
+-0.33
+-0.33
+-0.33
+-0.32
+-0.33
+-0.33
+-0.33
+-0.33
+-0.32
+-0.33
+-0.33
+-0.33
+-0.33
+-0.34
+-0.34
+-0.34
+-0.33
+-0.34
+-0.33
+-0.31
+-0.3
+-0.31
+-0.29
+-0.29
+-0.3
+-0.29
+-0.3
+-0.31
+-0.3
+-0.28
+-0.27
+-0.26
+-0.24
+-0.23
+-0.22
+-0.23
+-0.23
+-0.22
+-0.22
+-0.22
+-0.22
+-0.22
+-0.23
+-0.24
+-0.21
+-0.22
+-0.21
+-0.19
+-0.15
+-0.14
+-0.12
+-0.08
+-0.06
+-0.04
+-0.02
+-0.01
+0.0
+0.03
+0.06
+0.07
+0.09
+0.09
+0.08
+0.07
+0.03
+0.05
+0.04
+0.03
+0.03
+0.07
+0.08
+0.13
+0.15
+0.2
+0.23
+0.24
+0.24
+0.23
+0.22
+0.24
+0.23
+0.24
+0.26
+0.27
+0.28
+0.29
+0.28
+0.27
+0.3
+0.3
+0.3
+0.28
+0.27
+0.28
+0.29
+0.3
+0.32
+0.35
+0.37
+0.37
+0.38
+0.38
+0.38
+0.4
+0.4
+0.41
+0.4
+0.38
+0.36
+0.32
+0.27
+0.22
+0.21
+0.19
+0.15
+0.09
+0.04
+0.01
+-0.03
+-0.05
+-0.04
+-0.02
+-0.01
+-0.0
+-0.0
+0.0
+-0.0
+-0.0
+-0.0
+0.01
+0.03
+0.0
+-0.0
+0.0
+0.01
+0.01
+-0.0
+-0.0
+-0.02
+-0.03
+-0.03
+-0.04
+-0.06
+-0.07
+-0.09
+-0.1
+-0.1
+-0.13
+-0.17
+-0.2
+-0.22
+-0.22
+-0.2
+-0.2
+-0.17
+-0.14
+-0.11
+-0.11
+-0.12
+-0.14
+-0.17
+-0.2
+-0.2
+-0.22
+-0.22
+-0.22
+-0.24
+-0.24
+-0.24
+-0.26
+-0.26
+-0.26
+-0.23
+-0.22
+-0.18
+-0.14
+-0.1
+-0.07
+-0.03
+0.01
+0.03
+0.07
+0.08
+0.09
+0.1
+0.09
+0.08
+0.06
+0.02
+-0.02
+-0.01
+-0.01
+0.01
+0.02
+0.03
+0.04
+0.07
+0.08
+0.08
+0.08
+0.09
+0.07
+0.07
+0.07
+0.05
+0.06
+0.07
+0.06
+0.06
+0.07
+0.07
+0.06
+0.06
+0.04
+0.03
+-0.01
+-0.02
+-0.06
+-0.1
+-0.15
+-0.18
+-0.2
+-0.2
+-0.16
+-0.15
+-0.16
+-0.15
+-0.17
+-0.17
+-0.19
+-0.21
+-0.22
+-0.21
+-0.19
+-0.17
+-0.14
+-0.13
+-0.12
+-0.1
+-0.09
+-0.08
+-0.1
+-0.14
+-0.14
+-0.17
+-0.19
+-0.17
+-0.19
+-0.16
+-0.15
+-0.14
+-0.11
+-0.12
+-0.14
+-0.14
+-0.18
+-0.2
+-0.19
+-0.21
+-0.19
+-0.19
+-0.2
+-0.19
+-0.19
+-0.21
+-0.2
+-0.19
+-0.18
+-0.15
+-0.14
+-0.13
+-0.12
+-0.13
+-0.14
+-0.16
+-0.19
+-0.24
+-0.28
+-0.29
+-0.29
+-0.28
+-0.25
+-0.2
+-0.19
+-0.18
+-0.14
+-0.14
+-0.13
+-0.12
+-0.12
+-0.13
+-0.12
+-0.12
+-0.12
+-0.12
+-0.13
+-0.14
+-0.16
+-0.16
+-0.19
+-0.19
+-0.2
+-0.21
+-0.21
+-0.21
+-0.24
+-0.25
+-0.26
+-0.28
+-0.27
+-0.28
+-0.27
+-0.27
+-0.28
+-0.29
+-0.3
+-0.34
+-0.36
+-0.35
+-0.35
+-0.33
+-0.3
+-0.26
+-0.27
+-0.25
+-0.24
+-0.2
+-0.18
+-0.16
+-0.16
+-0.15
+-0.13
+-0.1
+-0.06
+-0.05
+-0.01
+0.03
+0.07
+0.09
+0.1
+0.11
+0.1
+0.09
+0.09
+0.08
+0.07
+0.1
+0.11
+0.12
+0.14
+0.12
+0.09
+0.05
+0.01
+0.02
+0.04
+0.05
+0.11
+0.13
+0.14
+0.17
+0.18
+0.21
+0.22
+0.23
+0.24
+0.22
+0.21
+0.2
+0.19
+0.19
+0.19
+0.21
+0.22
+0.24
+0.23
+0.24
+0.24
+0.23
+0.23
+0.21
+0.2
+0.19
+0.18
+0.17
+0.18
+0.17
+0.17
+0.16
+0.16
+0.15
+0.14
+0.12
+0.11
+0.11
+0.11
+0.1
+0.1
+0.09
+0.08
+0.1
+0.09
+0.1
+0.11
+0.11
+0.11
+0.13
+0.13
+0.15
+0.17
+0.17
+0.16
+0.17
+0.14
+0.14
+0.12
+0.11
+0.1
+0.09
+0.08
+0.06
+0.06
+0.07
+0.1
+0.13
+0.17
+0.21
+0.23
+0.23
+0.25
+0.27
+0.26
+0.26
+0.24
+0.24
+0.22
+0.18
+0.18
+0.18
+0.18
+0.19
+0.2
+0.21
+0.2
+0.19
+0.17
+0.17
+0.14
+0.15
+0.16
+0.15
+0.15
+0.14
+0.15
+0.14
+0.13
+0.12
+0.12
+0.1
+0.09
+0.08
+0.06
+0.04
+0.04
+0.03
+0.0
+-0.0
+-0.02
+-0.05
+-0.07
+-0.08
+-0.1
+-0.11
+-0.13
+-0.13
+-0.14
+-0.16
+-0.2
+-0.22
+-0.25
+-0.26
+-0.25
+-0.25
+-0.25
+-0.24
+-0.24
+-0.23
+-0.24
+-0.24
+-0.27
+-0.29
+-0.31
+-0.34
+-0.37
+-0.38
+-0.41
+-0.4
+-0.4
+-0.4
+-0.39
+-0.36
+-0.36
+-0.37
+-0.41
+-0.44
+-0.46
+-0.49
+-0.5
+-0.52
+-0.54
+-0.54
+-0.54
+-0.54
+-0.51
+-0.48
+-0.48
+-0.46
+-0.47
+-0.46
+-0.46
+-0.46
+-0.47
+-0.47
+-0.47
+-0.48
+-0.52
+-0.53
+-0.55
+-0.54
+-0.54
+-0.54
+-0.51
+-0.49
+-0.48
+-0.47
+-0.45
+-0.44
+-0.46
+-0.45
+-0.45
+-0.45
+-0.44
+-0.44
+-0.44
+-0.42
+-0.41
+-0.41
+-0.42
+-0.42
+-0.42
+-0.42
+-0.42
+-0.39
+-0.39
+-0.38
+-0.36
+-0.37
+-0.38
+-0.37
+-0.37
+-0.37
+-0.36
+-0.34
+-0.32
+-0.3
+-0.3
+-0.3
+-0.29
+-0.27
+-0.26
+-0.23
+-0.22
+-0.19
+-0.19
+-0.14
+-0.13
+-0.14
+-0.12
+-0.14
+-0.17
+-0.19
+-0.21
+-0.24
+-0.24
+-0.25
+-0.26
+-0.21
+-0.19
+-0.16
+-0.11
+-0.06
+-0.02
+0.03
+0.07
+0.09
+0.11
+0.14
+0.16
+0.16
+0.19
+0.2
+0.19
+0.21
+0.2
+0.18
+0.15
+0.13
+0.13
+0.17
+0.19
+0.24
+0.29
+0.33
+0.36
+0.4
+0.41
+0.39
+0.41
+0.39
+0.37
+0.39
+0.39
+0.4
+0.42
+0.44
+0.43
+0.44
+0.43
+0.42
+0.42
+0.44
+0.43
+0.45
+0.45
+0.45
+0.45
+0.44
+0.42
+0.44
+0.42
+0.41
+0.42
+0.43
+0.43
+0.43
+0.42
+0.38
+0.35
+0.33
+0.29
+0.28
+0.29
+0.3
+0.32
+0.33
+0.32
+0.31
+0.3
+0.31
+0.31
+0.3
+0.3
+0.27
+0.27
+0.27
+0.27
+0.28
+0.24
+0.24
+0.22
+0.17
+0.14
+0.13
+0.11
+0.13
+0.17
+0.19
+0.23
+0.25
+0.25
+0.25
+0.23
+0.21
+0.2
+0.17
+0.15
+0.17
+0.17
+0.17
+0.18
+0.18
+0.16
+0.16
+0.16
+0.16
+0.16
+0.15
+0.13
+0.12
+0.11
+0.11
+0.08
+0.06
+0.04
+0.01
+0.02
+-0.02
+-0.04
+-0.06
+-0.09
+-0.11
+-0.11
+-0.13
+-0.16
+-0.17
+-0.19
+-0.21
+-0.21
+-0.2
+-0.21
+-0.21
+-0.21
+-0.22
+-0.22
+-0.24
+-0.26
+-0.28
+-0.28
+-0.3
+-0.34
+-0.39
+-0.45
+-0.46
+-0.48
+-0.49
+-0.47
+-0.44
+-0.4
+-0.36
+-0.34
+-0.32
+-0.27
+-0.29
+-0.29
+-0.29
+-0.27
+-0.24
+-0.23
+-0.21
+-0.21
+-0.21
+-0.22
+-0.23
+-0.24
+-0.26
+-0.27
+-0.29
+-0.29
+-0.28
+-0.28
+-0.27
+-0.26
+-0.25
+-0.25
+-0.27
+-0.25
+-0.25
+-0.24
+-0.23
+-0.23
+-0.21
+-0.19
+-0.18
+-0.17
+-0.17
+-0.15
+-0.14
+-0.14
+-0.12
+-0.13
+-0.13
+-0.13
+-0.14
+-0.14
+-0.14
+-0.15
+-0.11
+-0.11
+-0.11
+-0.11
+-0.1
+-0.11
+-0.1
+-0.11
+-0.12
+-0.14
+-0.14
+-0.15
+-0.14
+-0.12
+-0.15
+-0.17
+-0.15
+-0.18
+-0.18
+-0.19
+-0.19
+-0.19
+-0.19
+-0.17
+-0.16
+-0.17
+-0.15
+-0.15
+-0.14
+-0.15
+-0.15
+-0.16
+-0.15
+-0.16
+-0.15
+-0.14
+-0.13
+-0.12
+-0.13
+-0.13
+-0.11
+-0.13
+-0.12
+-0.11
+-0.12
+-0.09
+-0.08
+-0.08
+-0.07
+-0.06
+-0.05
+-0.03
+-0.06
+-0.02
+-0.01
+-0.03
+-0.02
+-0.04
+-0.03
+-0.02
+-0.04
+-0.04
+-0.04
+-0.06
+-0.05
+-0.07
+-0.05
+-0.06
+-0.06
+-0.05
+-0.04
+-0.04
+-0.03
+-0.05
+-0.05
+-0.03
+-0.03
+-0.01
+0.01
+0.02
+0.03
+0.05
+0.06
+0.06
+0.08
+0.09
+0.09
+0.09
+0.1
+0.09
+0.06
+0.04
+0.03
+0.04
+0.07
+0.09
+0.13
+0.14
+0.17
+0.21
+0.23
+0.22
+0.21
+0.17
+0.16
+0.11
+0.08
+0.08
+0.07
+0.09
+0.11
+0.12
+0.14
+0.15
+0.13
+0.1
+0.06
+0.03
+0.03
+0.03
+0.04
+0.03
+0.01
+-0.01
+-0.04
+-0.06
+-0.09
+-0.13
+-0.14
+-0.14
+-0.14
+-0.12
+-0.1
+-0.11
+-0.09
+-0.09
+-0.1
+-0.1
+-0.09
+-0.08
+-0.07
+-0.07
+-0.06
+-0.04
+-0.06
+-0.08
+-0.09
+-0.1
+-0.1
+-0.12
+-0.11
+-0.12
+-0.14
+-0.12
+-0.09
+-0.08
+-0.05
+-0.02
+-0.01
+-0.01
+0.04
+0.03
+0.04
+0.06
+0.07
+0.06
+0.07
+0.07
+0.05
+0.06
+0.05
+0.04
+0.06
+0.05
+0.06
+0.05
+0.05
+0.04
+0.03
+0.04
+0.04
+0.07
+0.07
+0.08
+0.09
+0.06
+0.06
+0.05
+0.04
+0.05
+0.07
+0.07
+0.06
+0.07
+0.08
+0.05
+0.03
+0.03
+-0.0
+-0.03
+-0.06
+-0.09
+-0.11
+-0.14
+-0.14
+-0.14
+-0.14
+-0.16
+-0.15
+-0.15
+-0.14
+-0.14
+-0.14
+-0.12
+-0.12
+-0.11
+-0.12
+-0.12
+-0.11
+-0.13
+-0.14
+-0.13
+-0.14
+-0.13
+-0.13
+-0.15
+-0.12
+-0.13
+-0.15
+-0.14
+-0.14
+-0.14
+-0.13
+-0.13
+-0.15
+-0.15
+-0.16
+-0.18
+-0.2
+-0.21
+-0.22
+-0.23
+-0.23
+-0.23
+-0.22
+-0.21
+-0.21
+-0.25
+-0.28
+-0.32
+-0.37
+-0.41
+-0.44
+-0.47
+-0.49
+-0.49
+-0.51
+-0.49
+-0.45
+-0.4
+-0.37
+-0.34
+-0.33
+-0.32
+-0.33
+-0.35
+-0.35
+-0.37
+-0.33
+-0.31
+-0.29
+-0.27
+-0.23
+-0.22
+-0.21
+-0.18
+-0.18
+-0.16
+-0.13
+-0.12
+-0.11
+-0.09
+-0.09
+-0.1
+-0.09
+-0.1
+-0.09
+-0.08
+-0.07
+-0.05
+-0.03
+-0.03
+-0.02
+-0.01
+-0.01
+0.01
+0.01
+0.02
+-0.01
+-0.03
+-0.05
+-0.06
+-0.08
+-0.08
+-0.09
+-0.11
+-0.1
+-0.08
+-0.03
+0.01
+0.04
+0.07
+0.08
+0.08
+0.09
+0.07
+0.07
+0.07
+0.09
+0.08
+0.07
+0.1
+0.1
+0.1
+0.09
+0.14
+0.19
+0.23
+0.28
+0.32
+0.34
+0.36
+0.38
+0.38
+0.39
+0.4
+0.4
+0.41
+0.4
+0.39
+0.4
+0.4
+0.4
+0.38
+0.38
+0.37
+0.36
+0.37
+0.35
+0.33
+0.32
+0.31
+0.3
+0.28
+0.25
+0.24
+0.23
+0.23
+0.22
+0.21
+0.21
+0.22
+0.22
+0.23
+0.23
+0.22
+0.23
+0.23
+0.21
+0.2
+0.19
+0.19
+0.19
+0.18
+0.19
+0.17
+0.17
+0.18
+0.15
+0.15
+0.15
+0.13
+0.13
+0.12
+0.1
+0.09
+0.08
+0.07
+0.08
+0.06
+0.06
+0.05
+0.03
+0.0
+-0.07
+-0.11
+-0.14
+-0.17
+-0.2
+-0.22
+-0.21
+-0.17
+-0.14
+-0.14
+-0.16
+-0.19
+-0.21
+-0.2
+-0.18
+-0.17
+-0.16
+-0.14
+-0.14
+-0.13
+-0.13
+-0.13
+-0.15
+-0.17
+-0.17
+-0.17
+-0.16
+-0.14
+-0.13
+-0.12
+-0.11
+-0.14
+-0.16
+-0.2
+-0.24
+-0.28
+-0.28
+-0.27
+-0.25
+-0.23
+-0.21
+-0.19
+-0.19
+-0.18
+-0.18
+-0.2
+-0.21
+-0.22
+-0.24
+-0.23
+-0.22
+-0.22
+-0.21
+-0.22
+-0.23
+-0.25
+-0.27
+-0.26
+-0.25
+-0.26
+-0.26
+-0.25
+-0.27
+-0.27
+-0.26
+-0.28
+-0.27
+-0.28
+-0.29
+-0.29
+-0.29
+-0.31
+-0.31
+-0.32
+-0.33
+-0.33
+-0.35
+-0.35
+-0.35
+-0.35
+-0.36
+-0.36
+-0.39
+-0.42
+-0.45
+-0.46
+-0.5
+-0.57
+-0.59
+-0.59
+-0.6
+-0.56
+-0.5
+-0.48
+-0.46
+-0.42
+-0.43
+-0.43
+-0.41
+-0.42
+-0.41
+-0.4
+-0.39
+-0.41
+-0.4
+-0.39
+-0.38
+-0.36
+-0.34
+-0.33
+-0.31
+-0.28
+-0.27
+-0.24
+-0.22
+-0.19
+-0.17
+-0.14
+-0.13
+-0.13
+-0.11
+-0.09
+-0.07
+-0.06
+-0.04
+-0.04
+-0.05
+-0.07
+-0.09
+-0.11
+-0.14
+-0.15
+-0.1
+-0.08
+-0.03
+0.02
+0.05
+0.08
+0.09
+0.09
+0.07
+0.06
+0.06
+0.08
+0.1
+0.12
+0.16
+0.19
+0.22
+0.25
+0.28
+0.28
+0.27
+0.25
+0.23
+0.22
+0.19
+0.16
+0.16
+0.17
+0.2
+0.26
+0.29
+0.34
+0.39
+0.4
+0.42
+0.45
+0.45
+0.47
+0.49
+0.51
+0.51
+0.5
+0.46
+0.42
+0.37
+0.36
+0.35
+0.38
+0.41
+0.44
+0.46
+0.46
+0.47
+0.46
+0.46
+0.45
+0.42
+0.41
+0.39
+0.38
+0.36
+0.34
+0.34
+0.33
+0.32
+0.32
+0.3
+0.29
+0.29
+0.28
+0.28
+0.27
+0.29
+0.28
+0.27
+0.26
+0.25
+0.25
+0.24
+0.23
+0.2
+0.16
+0.11
+0.09
+0.04
+0.02
+0.01
+-0.01
+-0.03
+-0.04
+-0.04
+-0.03
+0.01
+0.05
+0.07
+0.08
+0.1
+0.11
+0.13
+0.1
+0.1
+0.07
+0.04
+0.03
+0.05
+0.05
+0.08
+0.09
+0.14
+0.14
+0.16
+0.16
+0.17
+0.16
+0.16
+0.17
+0.18
+0.2
+0.19
+0.2
+0.21
+0.21
+0.22
+0.21
+0.21
+0.19
+0.17
+0.18
+0.17
+0.16
+0.17
+0.17
+0.18
+0.17
+0.15
+0.13
+0.11
+0.09
+0.07
+0.08
+0.08
+0.09
+0.1
+0.11
+0.12
+0.1
+0.11
+0.1
+0.09
+0.08
+0.07
+0.03
+0.03
+-0.01
+-0.02
+-0.05
+-0.08
+-0.13
+-0.16
+-0.2
+-0.22
+-0.23
+-0.25
+-0.26
+-0.26
+-0.29
+-0.32
+-0.35
+-0.37
+-0.35
+-0.34
+-0.33
+-0.33
+-0.35
+-0.36
+-0.38
+-0.4
+-0.43
+-0.44
+-0.45
+-0.46
+-0.47
+-0.46
+-0.48
+-0.48
+-0.49
+-0.52
+-0.52
+-0.51
+-0.52
+-0.52
+-0.53
+-0.55
+-0.57
+-0.59
+-0.59
+-0.59
+-0.59
+-0.6
+-0.59
+-0.6
+-0.63
+-0.65
+-0.69
+-0.74
+-0.78
+-0.79
+-0.8
+-0.79
+-0.78
+-0.76
+-0.75
+-0.73
+-0.71
+-0.7
+-0.69
+-0.67
+-0.66
+-0.65
+-0.64
+-0.61
+-0.61
+-0.6
+-0.59
+-0.58
+-0.58
+-0.57
+-0.56
+-0.55
+-0.54
+-0.52
+-0.52
+-0.52
+-0.52
+-0.54
+-0.57
+-0.59
+-0.61
+-0.6
+-0.6
+-0.56
+-0.52
+-0.48
+-0.42
+-0.39
+-0.36
+-0.34
+-0.31
+-0.31
+-0.29
+-0.28
+-0.28
+-0.29
+-0.3
+-0.29
+-0.27
+-0.26
+-0.26
+-0.24
+-0.25
+-0.23
+-0.21
+-0.21
+-0.17
+-0.16
+-0.15
+-0.14
+-0.14
+-0.13
+-0.12
+-0.12
+-0.1
+-0.08
+-0.08
+-0.07
+-0.07
+-0.05
+-0.03
+-0.01
+0.02
+0.03
+0.07
+0.09
+0.1
+0.09
+0.11
+0.1
+0.09
+0.1
+0.12
+0.12
+0.15
+0.16
+0.16
+0.17
+0.2
+0.19
+0.2
+0.22
+0.21
+0.22
+0.23
+0.24
+0.26
+0.28
+0.3
+0.33
+0.35
+0.35
+0.36
+0.38
+0.38
+0.39
+0.39
+0.39
+0.38
+0.36
+0.37
+0.4
+0.41
+0.42
+0.42
+0.44
+0.44
+0.46
+0.46
+0.47
+0.47
+0.48
+0.48
+0.49
+0.49
+0.48
+0.51
+0.51
+0.52
+0.52
+0.52
+0.53
+0.51
+0.53
+0.52
+0.53
+0.53
+0.52
+0.52
+0.54
+0.53
+0.52
+0.53
+0.53
+0.52
+0.54
+0.53
+0.53
+0.55
+0.56
+0.55
+0.56
+0.54
+0.54
+0.54
+0.53
+0.52
+0.52
+0.5
+0.47
+0.45
+0.44
+0.4
+0.4
+0.37
+0.38
+0.39
+0.39
+0.41
+0.4
+0.4
+0.4
+0.4
+0.41
+0.4
+0.4
+0.39
+0.35
+0.34
+0.33
+0.32
+0.32
+0.32
+0.29
+0.27
+0.26
+0.24
+0.24
+0.24
+0.24
+0.22
+0.24
+0.23
+0.24
+0.24
+0.26
+0.26
+0.26
+0.24
+0.23
+0.23
+0.22
+0.22
+0.2
+0.17
+0.17
+0.14
+0.11
+0.1
+0.09
+0.07
+0.08
+0.02
+-0.03
+-0.07
+-0.12
+-0.16
+-0.2
+-0.24
+-0.27
+-0.28
+-0.27
+-0.25
+-0.24
+-0.23
+-0.22
+-0.21
+-0.21
+-0.23
+-0.26
+-0.31
+-0.36
+-0.41
+-0.46
+-0.48
+-0.5
+-0.51
+-0.47
+-0.48
+-0.46
+-0.43
+-0.42
+-0.39
+-0.37
+-0.39
+-0.38
+-0.38
+-0.4
+-0.42
+-0.46
+-0.48
+-0.48
+-0.47
+-0.46
+-0.47
+-0.47
+-0.48
+-0.47
+-0.46
+-0.47
+-0.48
+-0.48
+-0.51
+-0.52
+-0.53
+-0.53
+-0.51
+-0.52
+-0.52
+-0.53
+-0.54
+-0.52
+-0.55
+-0.55
+-0.54
+-0.53
+-0.53
+-0.52
+-0.51
+-0.5
+-0.47
+-0.5
+-0.47
+-0.47
+-0.46
+-0.42
+-0.43
+-0.41
+-0.39
+-0.39
+-0.39
+-0.38
+-0.39
+-0.39
+-0.42
+-0.46
+-0.48
+-0.49
+-0.47
+-0.45
+-0.43
+-0.39
+-0.38
+-0.37
+-0.35
+-0.35
+-0.36
+-0.34
+-0.35
+-0.33
+-0.32
+-0.33
+-0.32
+-0.33
+-0.34
+-0.33
+-0.35
+-0.35
+-0.33
+-0.33
+-0.32
+-0.32
+-0.31
+-0.32
+-0.3
+-0.29
+-0.29
+-0.27
+-0.23
+-0.23
+-0.22
+-0.22
+-0.25
+-0.26
+-0.27
+-0.29
+-0.28
+-0.25
+-0.22
+-0.19
+-0.15
+-0.13
+-0.13
+-0.14
+-0.17
+-0.19
+-0.2
+-0.22
+-0.21
+-0.2
+-0.19
+-0.14
+-0.09
+-0.04
+0.02
+0.04
+0.04
+0.03
+-0.01
+-0.02
+-0.03
+-0.04
+-0.03
+-0.02
+0.01
+0.04
+0.09
+0.11
+0.14
+0.14
+0.15
+0.16
+0.15
+0.16
+0.17
+0.18
+0.18
+0.19
+0.2
+0.23
+0.21
+0.21
+0.21
+0.2
+0.2
+0.23
+0.22
+0.22
+0.21
+0.17
+0.15
+0.12
+0.1
+0.1
+0.11
+0.13
+0.15
+0.16
+0.16
+0.17
+0.17
+0.16
+0.15
+0.16
+0.16
+0.14
+0.13
+0.11
+0.07
+0.04
+0.03
+0.01
+-0.01
+0.01
+0.02
+0.02
+0.03
+0.04
+0.05
+0.05
+0.03
+-0.01
+-0.03
+-0.07
+-0.11
+-0.15
+-0.17
+-0.16
+-0.14
+-0.09
+-0.07
+-0.03
+-0.01
+-0.01
+0.01
+0.03
+0.04
+0.05
+0.05
+0.05
+0.05
+0.04
+0.03
+0.02
+0.0
+-0.01
+-0.02
+-0.02
+-0.04
+-0.04
+-0.04
+-0.03
+-0.03
+-0.03
+-0.01
+-0.0
+-0.0
+0.0
+0.01
+0.01
+0.01
+0.04
+0.02
+0.02
+0.02
+0.03
+0.03
+0.03
+0.04
+0.04
+0.03
+0.02
+0.02
+0.03
+0.04
+0.05
+0.08
+0.1
+0.09
+0.13
+0.13
+0.14
+0.15
+0.16
+0.15
+0.15
+0.15
+0.14
+0.15
+0.15
+0.15
+0.15
+0.14
+0.12
+0.1
+0.1
+0.1
+0.09
+0.11
+0.13
+0.14
+0.16
+0.19
+0.2
+0.19
+0.2
+0.19
+0.18
+0.13
+0.09
+0.05
+0.03
+0.02
+0.01
+0.03
+0.04
+0.07
+0.09
+0.11
+0.11
+0.12
+0.11
+0.11
+0.13
+0.12
+0.12
+0.09
+0.08
+0.05
+0.03
+0.03
+0.03
+0.02
+0.01
+0.01
+-0.01
+-0.03
+-0.05
+-0.05
+-0.05
+-0.06
+-0.06
+-0.07
+-0.07
+-0.09
+-0.08
+-0.08
+-0.11
+-0.1
+-0.12
+-0.14
+-0.15
+-0.17
+-0.15
+-0.14
+-0.14
+-0.15
+-0.15
+-0.17
+-0.15
+-0.14
+-0.13
+-0.12
+-0.13
+-0.14
+-0.14
+-0.13
+-0.12
+-0.13
+-0.12
+-0.11
+-0.08
+-0.09
+-0.09
+-0.13
+-0.11
+-0.11
+-0.14
+-0.16
+-0.17
+-0.2
+-0.21
+-0.23
+-0.24
+-0.26
+-0.25
+-0.23
+-0.21
+-0.19
+-0.16
+-0.11
+-0.11
+-0.1
+-0.12
+-0.15
+-0.17
+-0.22
+-0.25
+-0.27
+-0.26
+-0.25
+-0.22
+-0.2
+-0.19
+-0.17
+-0.17
+-0.19
+-0.2
+-0.2
+-0.2
+-0.16
+-0.14
+-0.13
+-0.11
+-0.11
+-0.11
+-0.14
+-0.13
+-0.14
+-0.14
+-0.15
+-0.14
+-0.14
+-0.16
+-0.16
+-0.14
+-0.17
+-0.17
+-0.19
+-0.18
+-0.18
+-0.19
+-0.19
+-0.19
+-0.2
+-0.19
+-0.2
+-0.21
+-0.2
+-0.21
+-0.2
+-0.19
+-0.21
+-0.2
+-0.2
+-0.22
+-0.23
+-0.24
+-0.26
+-0.27
+-0.3
+-0.31
+-0.33
+-0.35
+-0.36
+-0.4
+-0.43
+-0.46
+-0.47
+-0.46
+-0.44
+-0.42
+-0.4
+-0.36
+-0.36
+-0.36
+-0.34
+-0.35
+-0.34
+-0.33
+-0.34
+-0.35
+-0.36
+-0.36
+-0.36
+-0.37
+-0.37
+-0.39
+-0.4
+-0.4
+-0.4
+-0.39
+-0.4
+-0.38
+-0.36
+-0.34
+-0.34
+-0.31
+-0.31
+-0.29
+-0.26
+-0.27
+-0.28
+-0.29
+-0.27
+-0.25
+-0.24
+-0.21
+-0.19
+-0.16
+-0.14
+-0.13
+-0.11
+-0.1
+-0.08
+-0.08
+-0.11
+-0.13
+-0.15
+-0.18
+-0.19
+-0.2
+-0.2
+-0.18
+-0.18
+-0.16
+-0.13
+-0.11
+-0.09
+-0.08
+-0.08
+-0.05
+-0.03
+-0.02
+0.0
+0.05
+0.1
+0.16
+0.19
+0.25
+0.27
+0.29
+0.33
+0.32
+0.31
+0.32
+0.31
+0.3
+0.3
+0.3
+0.29
+0.29
+0.3
+0.28
+0.29
+0.31
+0.32
+0.33
+0.33
+0.31
+0.28
+0.29
+0.29
+0.3
+0.3
+0.28
+0.26
+0.26
+0.24
+0.24
+0.22
+0.18
+0.17
+0.16
+0.17
+0.19
+0.2
+0.21
+0.24
+0.25
+0.25
+0.26
+0.23
+0.23
+0.21
+0.17
+0.14
+0.14
+0.16
+0.18
+0.21
+0.24
+0.26
+0.28
+0.29
+0.29
+0.27
+0.26
+0.25
+0.25
+0.26
+0.24
+0.23
+0.23
+0.23
+0.22
+0.21
+0.17
+0.15
+0.1
+0.08
+0.08
+0.09
+0.1
+0.11
+0.11
+0.13
+0.14
+0.15
+0.13
+0.1
+0.11
+0.09
+0.08
+0.09
+0.08
+0.08
+0.09
+0.09
+0.11
+0.09
+0.1
+0.08
+0.03
+0.01
+-0.06
+-0.11
+-0.12
+-0.13
+-0.12
+-0.1
+-0.11
+-0.14
+-0.15
+-0.18
+-0.2
+-0.24
+-0.27
+-0.31
+-0.35
+-0.37
+-0.4
+-0.42
+-0.44
+-0.44
+-0.42
+-0.41
+-0.42
+-0.43
+-0.48
+-0.48
+-0.51
+-0.53
+-0.52
+-0.51
+-0.5
+-0.47
+-0.44
+-0.42
+-0.4
+-0.39
+-0.39
+-0.38
+-0.42
+-0.45
+-0.44
+-0.44
+-0.42
+-0.44
+-0.47
+-0.49
+-0.49
+-0.51
+-0.51
+-0.5
+-0.47
+-0.41
+-0.37
+-0.33
+-0.31
+-0.31
+-0.3
+-0.28
+-0.26
+-0.24
+-0.22
+-0.21
+-0.19
+-0.17
+-0.16
+-0.16
+-0.15
+-0.15
+-0.17
+-0.18
+-0.21
+-0.23
+-0.24
+-0.23
+-0.24
+-0.2
+-0.2
+-0.17
+-0.16
+-0.14
+-0.11
+-0.09
+-0.07
+-0.08
+-0.06
+-0.04
+-0.02
+0.01
+0.03
+0.08
+0.11
+0.14
+0.17
+0.21
+0.21
+0.23
+0.25
+0.26
+0.27
+0.23
+0.21
+0.2
+0.18
+0.2
+0.21
+0.23
+0.24
+0.24
+0.24
+0.23
+0.22
+0.21
+0.21
+0.22
+0.24
+0.24
+0.26
+0.27
+0.27
+0.3
+0.29
+0.29
+0.3
+0.29
+0.29
+0.29
+0.26
+0.27
+0.28
+0.27
+0.28
+0.26
+0.24
+0.24
+0.22
+0.22
+0.22
+0.23
+0.25
+0.24
+0.25
+0.27
+0.27
+0.26
+0.26
+0.24
+0.22
+0.2
+0.19
+0.16
+0.16
+0.15
+0.13
+0.11
+0.13
+0.14
+0.14
+0.14
+0.13
+0.14
+0.13
+0.1
+0.1
+0.08
+0.09
+0.08
+0.07
+0.04
+0.02
+0.0
+-0.03
+-0.05
+-0.08
+-0.09
+-0.1
+-0.1
+-0.11
+-0.12
+-0.1
+-0.14
+-0.12
+-0.15
+-0.19
+-0.21
+-0.25
+-0.31
+-0.32
+-0.33
+-0.32
+-0.32
+-0.36
+-0.38
+-0.4
+-0.43
+-0.41
+-0.41
+-0.37
+-0.33
+-0.32
+-0.3
+-0.28
+-0.29
+-0.27
+-0.28
+-0.26
+-0.27
+-0.27
+-0.28
+-0.27
+-0.27
+-0.27
+-0.26
+-0.27
+-0.28
+-0.31
+-0.37
+-0.41
+-0.42
+-0.42
+-0.38
+-0.36
+-0.34
+-0.29
+-0.28
+-0.26
+-0.24
+-0.25
+-0.26
+-0.26
+-0.27
+-0.27
+-0.29
+-0.28
+-0.27
+-0.25
+-0.21
+-0.21
+-0.21
+-0.2
+-0.2
+-0.19
+-0.15
+-0.13
+-0.13
+-0.13
+-0.14
+-0.15
+-0.15
+-0.1
+-0.07
+-0.03
+0.02
+0.06
+0.08
+0.08
+0.07
+0.05
+0.05
+0.05
+0.07
+0.12
+0.16
+0.2
+0.24
+0.26
+0.28
+0.3
+0.3
+0.31
+0.31
+0.3
+0.31
+0.31
+0.3
+0.27
+0.24
+0.23
+0.2
+0.19
+0.22
+0.23
+0.24
+0.26
+0.27
+0.29
+0.3
+0.3
+0.3
+0.3
+0.31
+0.3
+0.3
+0.32
+0.3
+0.3
+0.28
+0.28
+0.27
+0.23
+0.2
+0.17
+0.15
+0.14
+0.14
+0.11
+0.1
+0.07
+0.03
+0.0
+-0.06
+-0.1
+-0.1
+-0.12
+-0.12
+-0.08
+-0.08
+-0.03
+-0.01
+0.01
+0.01
+0.03
+0.04
+0.02
+-0.01
+-0.04
+-0.07
+-0.07
+-0.05
+-0.05
+-0.04
+-0.03
+-0.02
+-0.0
+0.01
+0.01
+0.01
+0.01
+-0.01
+-0.02
+-0.03
+-0.03
+-0.04
+-0.04
+-0.03
+-0.05
+-0.08
+-0.13
+-0.17
+-0.2
+-0.24
+-0.28
+-0.29
+-0.29
+-0.26
+-0.21
+-0.19
+-0.17
+-0.17
+-0.19
+-0.2
+-0.22
+-0.19
+-0.16
+-0.14
+-0.13
+-0.11
+-0.11
+-0.12
+-0.12
+-0.13
+-0.13
+-0.13
+-0.16
+-0.19
+-0.19
+-0.21
+-0.19
+-0.19
+-0.18
+-0.16
+-0.16
+-0.2
+-0.22
+-0.25
+-0.29
+-0.29
+-0.31
+-0.33
+-0.32
+-0.33
+-0.34
+-0.33
+-0.32
+-0.33
+-0.35
+-0.32
+-0.28
+-0.25
+-0.22
+-0.2
+-0.18
+-0.18
+-0.21
+-0.21
+-0.26
+-0.27
+-0.28
+-0.3
+-0.29
+-0.28
+-0.26
+-0.23
+-0.21
+-0.21
+-0.21
+-0.22
+-0.24
+-0.26
+-0.24
+-0.21
+-0.17
+-0.13
+-0.09
+-0.07
+-0.05
+-0.04
+-0.04
+-0.08
+-0.12
+-0.18
+-0.19
+-0.22
+-0.24
+-0.25
+-0.25
+-0.23
+-0.2
+-0.17
+-0.15
+-0.17
+-0.19
+-0.21
+-0.22
+-0.22
+-0.23
+-0.24
+-0.23
+-0.21
+-0.2
+-0.18
+-0.16
+-0.16
+-0.13
+-0.13
+-0.13
+-0.14
+-0.13
+-0.14
+-0.13
+-0.1
+-0.11
+-0.09
+-0.08
+-0.09
+-0.05
+-0.06
+-0.05
+-0.03
+-0.06
+-0.05
+-0.04
+-0.07
+-0.06
+-0.04
+-0.04
+-0.03
+-0.04
+-0.05
+-0.03
+-0.03
+-0.02
+-0.02
+0.01
+0.01
+0.02
+0.02
+0.03
+0.01
+-0.01
+-0.05
+-0.08
+-0.09
+-0.07
+-0.05
+-0.03
+-0.02
+-0.02
+-0.0
+-0.01
+-0.0
+0.02
+0.04
+0.07
+0.09
+0.12
+0.14
+0.17
+0.16
+0.2
+0.22
+0.24
+0.25
+0.27
+0.26
+0.28
+0.27
+0.27
+0.26
+0.25
+0.25
+0.29
+0.31
+0.35
+0.36
+0.37
+0.4
+SHAR_EOF
+  $shar_touch -am 0521114099 'ir.dat' &&
+  chmod 0644 'ir.dat' ||
+  echo 'restore of ir.dat failed'
+  shar_count="`wc -c < 'ir.dat'`"
+  test 22410 -eq "$shar_count" ||
+    echo "ir.dat: original size 22410, current size $shar_count"
+fi
+# ============= wire.dat ==============
+if test -f 'wire.dat' && test X"$1" != X"-c"; then
+  echo 'x - skipping wire.dat (File already exists)'
+else
+  echo 'x - extracting wire.dat (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wire.dat' &&
+-0.67
+-0.66
+-0.64
+-0.63
+-0.62
+-0.61
+-0.61
+-0.6
+-0.6
+-0.61
+-0.6
+-0.58
+-0.58
+-0.57
+-0.57
+-0.57
+-0.56
+-0.55
+-0.52
+-0.52
+-0.51
+-0.5
+-0.48
+-0.46
+-0.44
+-0.4
+-0.39
+-0.37
+-0.33
+-0.32
+-0.31
+-0.29
+-0.29
+-0.28
+-0.27
+-0.26
+-0.26
+-0.26
+-0.24
+-0.23
+-0.22
+-0.21
+-0.21
+-0.2
+-0.17
+-0.18
+-0.17
+-0.17
+-0.15
+-0.15
+-0.13
+-0.13
+-0.12
+-0.11
+-0.1
+-0.09
+-0.09
+-0.08
+-0.08
+-0.08
+-0.08
+-0.08
+-0.08
+-0.08
+-0.08
+-0.07
+-0.07
+-0.07
+-0.06
+-0.06
+-0.05
+-0.05
+-0.05
+-0.04
+-0.04
+-0.03
+-0.02
+-0.02
+-0.0
+0.01
+0.01
+0.03
+0.03
+0.03
+0.04
+0.02
+0.03
+-0.0
+0.0
+0.01
+-0.02
+-0.03
+-0.03
+-0.05
+-0.05
+-0.04
+-0.05
+-0.03
+-0.03
+-0.03
+-0.01
+-0.0
+-0.0
+0.01
+0.02
+0.04
+0.04
+0.06
+0.07
+0.07
+0.08
+0.09
+0.08
+0.09
+0.07
+0.04
+0.03
+0.0
+-0.03
+-0.05
+-0.08
+-0.09
+-0.1
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.11
+-0.11
+-0.09
+-0.08
+-0.08
+-0.06
+-0.02
+-0.03
+-0.02
+-0.0
+0.0
+0.02
+0.02
+0.01
+0.01
+0.01
+-0.0
+-0.01
+-0.02
+-0.04
+-0.04
+-0.05
+-0.06
+-0.06
+-0.07
+-0.07
+-0.08
+-0.08
+-0.1
+-0.1
+-0.1
+-0.11
+-0.12
+-0.13
+-0.14
+-0.16
+-0.16
+-0.16
+-0.17
+-0.17
+-0.16
+-0.17
+-0.16
+-0.16
+-0.16
+-0.14
+-0.14
+-0.13
+-0.12
+-0.12
+-0.11
+-0.11
+-0.11
+-0.11
+-0.11
+-0.1
+-0.09
+-0.09
+-0.07
+-0.06
+-0.07
+-0.06
+-0.06
+-0.07
+-0.07
+-0.08
+-0.1
+-0.1
+-0.11
+-0.13
+-0.15
+-0.16
+-0.18
+-0.19
+-0.2
+-0.22
+-0.24
+-0.26
+-0.27
+-0.29
+-0.29
+-0.29
+-0.31
+-0.3
+-0.3
+-0.3
+-0.3
+-0.32
+-0.33
+-0.33
+-0.34
+-0.35
+-0.36
+-0.37
+-0.36
+-0.38
+-0.38
+-0.38
+-0.38
+-0.38
+-0.38
+-0.37
+-0.36
+-0.37
+-0.37
+-0.37
+-0.38
+-0.37
+-0.36
+-0.37
+-0.37
+-0.36
+-0.35
+-0.36
+-0.33
+-0.33
+-0.32
+-0.31
+-0.32
+-0.32
+-0.31
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.31
+-0.3
+-0.31
+-0.3
+-0.3
+-0.3
+-0.28
+-0.28
+-0.29
+-0.26
+-0.27
+-0.27
+-0.27
+-0.28
+-0.3
+-0.3
+-0.3
+-0.31
+-0.32
+-0.32
+-0.32
+-0.33
+-0.33
+-0.31
+-0.31
+-0.3
+-0.28
+-0.29
+-0.26
+-0.25
+-0.25
+-0.22
+-0.23
+-0.21
+-0.2
+-0.19
+-0.2
+-0.18
+-0.18
+-0.19
+-0.18
+-0.18
+-0.18
+-0.17
+-0.17
+-0.16
+-0.15
+-0.14
+-0.13
+-0.12
+-0.12
+-0.11
+-0.09
+-0.1
+-0.11
+-0.12
+-0.12
+-0.14
+-0.15
+-0.15
+-0.16
+-0.16
+-0.19
+-0.18
+-0.18
+-0.2
+-0.19
+-0.2
+-0.22
+-0.21
+-0.23
+-0.23
+-0.24
+-0.24
+-0.26
+-0.26
+-0.26
+-0.26
+-0.27
+-0.29
+-0.28
+-0.3
+-0.3
+-0.31
+-0.31
+-0.32
+-0.33
+-0.33
+-0.33
+-0.33
+-0.34
+-0.34
+-0.34
+-0.34
+-0.35
+-0.35
+-0.35
+-0.35
+-0.34
+-0.33
+-0.34
+-0.32
+-0.33
+-0.34
+-0.33
+-0.35
+-0.36
+-0.36
+-0.37
+-0.37
+-0.37
+-0.38
+-0.37
+-0.37
+-0.36
+-0.36
+-0.34
+-0.32
+-0.32
+-0.31
+-0.3
+-0.3
+-0.29
+-0.3
+-0.28
+-0.29
+-0.29
+-0.28
+-0.27
+-0.26
+-0.25
+-0.26
+-0.25
+-0.23
+-0.24
+-0.22
+-0.22
+-0.22
+-0.23
+-0.25
+-0.25
+-0.26
+-0.28
+-0.3
+-0.3
+-0.31
+-0.32
+-0.32
+-0.31
+-0.31
+-0.32
+-0.29
+-0.27
+-0.27
+-0.26
+-0.25
+-0.25
+-0.23
+-0.23
+-0.22
+-0.2
+-0.2
+-0.19
+-0.17
+-0.18
+-0.17
+-0.17
+-0.18
+-0.17
+-0.18
+-0.19
+-0.18
+-0.2
+-0.19
+-0.19
+-0.19
+-0.17
+-0.17
+-0.17
+-0.16
+-0.15
+-0.13
+-0.13
+-0.13
+-0.12
+-0.12
+-0.13
+-0.13
+-0.14
+-0.14
+-0.14
+-0.14
+-0.13
+-0.14
+-0.13
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.11
+-0.11
+-0.11
+-0.1
+-0.09
+-0.08
+-0.07
+-0.05
+-0.04
+-0.05
+-0.02
+-0.01
+-0.0
+0.02
+0.04
+0.05
+0.07
+0.08
+0.1
+0.12
+0.13
+0.14
+0.13
+0.11
+0.11
+0.1
+0.09
+0.09
+0.07
+0.08
+0.08
+0.07
+0.08
+0.07
+0.07
+0.08
+0.07
+0.06
+0.06
+0.05
+0.04
+0.04
+0.02
+0.02
+0.03
+0.04
+0.04
+0.04
+0.04
+0.05
+0.05
+0.05
+0.06
+0.06
+0.06
+0.08
+0.07
+0.08
+0.09
+0.1
+0.12
+0.12
+0.1
+0.13
+0.11
+0.1
+0.1
+0.09
+0.07
+0.08
+0.07
+0.05
+0.05
+0.04
+0.03
+0.04
+0.03
+0.03
+0.02
+0.03
+0.01
+0.01
+0.01
+-0.01
+-0.02
+-0.01
+-0.03
+-0.02
+-0.02
+-0.05
+-0.06
+-0.08
+-0.1
+-0.12
+-0.16
+-0.18
+-0.2
+-0.23
+-0.26
+-0.27
+-0.29
+-0.31
+-0.32
+-0.33
+-0.34
+-0.36
+-0.35
+-0.36
+-0.35
+-0.35
+-0.35
+-0.35
+-0.37
+-0.36
+-0.38
+-0.38
+-0.39
+-0.4
+-0.43
+-0.44
+-0.46
+-0.46
+-0.47
+-0.47
+-0.48
+-0.48
+-0.5
+-0.49
+-0.51
+-0.52
+-0.52
+-0.54
+-0.55
+-0.55
+-0.56
+-0.55
+-0.56
+-0.57
+-0.56
+-0.56
+-0.57
+-0.58
+-0.57
+-0.58
+-0.57
+-0.57
+-0.57
+-0.57
+-0.56
+-0.56
+-0.57
+-0.56
+-0.57
+-0.58
+-0.59
+-0.57
+-0.59
+-0.6
+-0.6
+-0.6
+-0.6
+-0.6
+-0.61
+-0.61
+-0.62
+-0.61
+-0.62
+-0.62
+-0.63
+-0.62
+-0.62
+-0.62
+-0.61
+-0.62
+-0.61
+-0.6
+-0.6
+-0.6
+-0.6
+-0.6
+-0.6
+-0.59
+-0.59
+-0.58
+-0.57
+-0.56
+-0.54
+-0.53
+-0.51
+-0.51
+-0.5
+-0.51
+-0.5
+-0.47
+-0.47
+-0.46
+-0.44
+-0.43
+-0.41
+-0.39
+-0.38
+-0.36
+-0.35
+-0.31
+-0.27
+-0.26
+-0.24
+-0.23
+-0.21
+-0.21
+-0.19
+-0.19
+-0.18
+-0.17
+-0.17
+-0.17
+-0.15
+-0.15
+-0.14
+-0.13
+-0.12
+-0.11
+-0.11
+-0.1
+-0.08
+-0.07
+-0.06
+-0.04
+-0.03
+-0.03
+-0.02
+0.01
+0.0
+0.02
+0.04
+0.04
+0.05
+0.05
+0.05
+0.06
+0.07
+0.06
+0.06
+0.06
+0.06
+0.06
+0.05
+0.05
+0.04
+0.03
+0.02
+0.02
+0.01
+0.01
+-0.01
+-0.01
+-0.01
+-0.02
+-0.04
+-0.05
+-0.07
+-0.07
+-0.08
+-0.1
+-0.1
+-0.1
+-0.11
+-0.1
+-0.1
+-0.1
+-0.1
+-0.11
+-0.11
+-0.1
+-0.09
+-0.07
+-0.05
+-0.04
+-0.02
+-0.02
+-0.01
+-0.01
+-0.02
+-0.03
+-0.03
+-0.05
+-0.06
+-0.05
+-0.07
+-0.09
+-0.1
+-0.12
+-0.12
+-0.14
+-0.15
+-0.15
+-0.17
+-0.17
+-0.18
+-0.19
+-0.19
+-0.2
+-0.2
+-0.2
+-0.22
+-0.23
+-0.24
+-0.25
+-0.25
+-0.26
+-0.26
+-0.26
+-0.28
+-0.28
+-0.28
+-0.29
+-0.28
+-0.27
+-0.27
+-0.27
+-0.26
+-0.25
+-0.24
+-0.23
+-0.23
+-0.21
+-0.2
+-0.19
+-0.17
+-0.16
+-0.15
+-0.13
+-0.12
+-0.12
+-0.1
+-0.09
+-0.09
+-0.06
+-0.06
+-0.06
+-0.03
+-0.02
+-0.01
+0.0
+0.01
+0.04
+0.06
+0.07
+0.1
+0.12
+0.16
+0.18
+0.19
+0.21
+0.22
+0.22
+0.23
+0.22
+0.21
+0.22
+0.2
+0.21
+0.21
+0.19
+0.2
+0.19
+0.18
+0.2
+0.2
+0.21
+0.23
+0.23
+0.25
+0.24
+0.24
+0.25
+0.26
+0.27
+0.27
+0.27
+0.28
+0.28
+0.27
+0.27
+0.26
+0.25
+0.24
+0.21
+0.19
+0.19
+0.16
+0.14
+0.13
+0.1
+0.06
+0.05
+0.02
+-0.02
+-0.03
+-0.05
+-0.09
+-0.1
+-0.11
+-0.13
+-0.14
+-0.15
+-0.16
+-0.16
+-0.16
+-0.16
+-0.18
+-0.17
+-0.17
+-0.18
+-0.18
+-0.19
+-0.2
+-0.2
+-0.21
+-0.22
+-0.23
+-0.24
+-0.25
+-0.27
+-0.28
+-0.3
+-0.32
+-0.34
+-0.35
+-0.38
+-0.4
+-0.42
+-0.44
+-0.45
+-0.47
+-0.47
+-0.48
+-0.5
+-0.5
+-0.5
+-0.51
+-0.51
+-0.52
+-0.52
+-0.53
+-0.52
+-0.52
+-0.51
+-0.5
+-0.5
+-0.5
+-0.5
+-0.49
+-0.48
+-0.47
+-0.48
+-0.48
+-0.46
+-0.47
+-0.46
+-0.46
+-0.47
+-0.47
+-0.49
+-0.5
+-0.5
+-0.52
+-0.55
+-0.55
+-0.59
+-0.59
+-0.63
+-0.68
+-0.69
+-0.71
+-0.72
+-0.74
+-0.75
+-0.76
+-0.77
+-0.78
+-0.78
+-0.77
+-0.76
+-0.75
+-0.75
+-0.74
+-0.73
+-0.72
+-0.72
+-0.7
+-0.68
+-0.66
+-0.65
+-0.63
+-0.61
+-0.59
+-0.58
+-0.57
+-0.55
+-0.54
+-0.52
+-0.51
+-0.49
+-0.49
+-0.48
+-0.47
+-0.46
+-0.44
+-0.44
+-0.41
+-0.4
+-0.4
+-0.38
+-0.36
+-0.37
+-0.35
+-0.35
+-0.35
+-0.34
+-0.34
+-0.35
+-0.35
+-0.35
+-0.37
+-0.37
+-0.38
+-0.4
+-0.41
+-0.43
+-0.45
+-0.45
+-0.46
+-0.47
+-0.47
+-0.47
+-0.46
+-0.47
+-0.48
+-0.47
+-0.46
+-0.47
+-0.46
+-0.45
+-0.45
+-0.43
+-0.42
+-0.41
+-0.4
+-0.39
+-0.4
+-0.38
+-0.37
+-0.38
+-0.37
+-0.37
+-0.37
+-0.36
+-0.35
+-0.35
+-0.33
+-0.32
+-0.32
+-0.3
+-0.29
+-0.27
+-0.25
+-0.23
+-0.22
+-0.2
+-0.19
+-0.19
+-0.17
+-0.17
+-0.16
+-0.16
+-0.16
+-0.16
+-0.17
+-0.17
+-0.16
+-0.16
+-0.15
+-0.12
+-0.12
+-0.12
+-0.11
+-0.09
+-0.05
+-0.02
+0.0
+0.05
+0.07
+0.1
+0.14
+0.16
+0.17
+0.21
+0.22
+0.24
+0.24
+0.25
+0.26
+0.25
+0.26
+0.26
+0.27
+0.28
+0.29
+0.28
+0.29
+0.3
+0.29
+0.31
+0.31
+0.33
+0.33
+0.33
+0.33
+0.34
+0.33
+0.33
+0.3
+0.3
+0.3
+0.28
+0.27
+0.28
+0.26
+0.27
+0.26
+0.25
+0.24
+0.22
+0.2
+0.18
+0.16
+0.16
+0.15
+0.12
+0.13
+0.11
+0.09
+0.08
+0.07
+0.06
+0.05
+0.03
+0.02
+0.02
+0.0
+-0.01
+-0.02
+-0.04
+-0.05
+-0.06
+-0.08
+-0.08
+-0.09
+-0.1
+-0.1
+-0.11
+-0.11
+-0.1
+-0.12
+-0.12
+-0.11
+-0.12
+-0.12
+-0.12
+-0.13
+-0.12
+-0.12
+-0.14
+-0.13
+-0.13
+-0.15
+-0.14
+-0.13
+-0.14
+-0.14
+-0.15
+-0.15
+-0.14
+-0.15
+-0.15
+-0.15
+-0.16
+-0.15
+-0.16
+-0.17
+-0.16
+-0.17
+-0.17
+-0.17
+-0.18
+-0.15
+-0.15
+-0.16
+-0.16
+-0.15
+-0.16
+-0.15
+-0.15
+-0.16
+-0.16
+-0.16
+-0.16
+-0.17
+-0.17
+-0.18
+-0.18
+-0.19
+-0.19
+-0.2
+-0.2
+-0.21
+-0.22
+-0.22
+-0.23
+-0.25
+-0.24
+-0.24
+-0.26
+-0.26
+-0.27
+-0.3
+-0.31
+-0.32
+-0.33
+-0.35
+-0.35
+-0.37
+-0.38
+-0.37
+-0.39
+-0.41
+-0.41
+-0.43
+-0.44
+-0.45
+-0.45
+-0.46
+-0.46
+-0.47
+-0.47
+-0.46
+-0.47
+-0.48
+-0.47
+-0.48
+-0.49
+-0.49
+-0.5
+-0.5
+-0.49
+-0.5
+-0.5
+-0.49
+-0.49
+-0.48
+-0.47
+-0.45
+-0.44
+-0.43
+-0.41
+-0.41
+-0.4
+-0.39
+-0.4
+-0.4
+-0.39
+-0.4
+-0.4
+-0.4
+-0.4
+-0.4
+-0.41
+-0.4
+-0.4
+-0.41
+-0.42
+-0.42
+-0.43
+-0.44
+-0.45
+-0.45
+-0.46
+-0.47
+-0.48
+-0.49
+-0.5
+-0.49
+-0.5
+-0.48
+-0.5
+-0.51
+-0.49
+-0.5
+-0.53
+-0.5
+-0.5
+-0.51
+-0.49
+-0.49
+-0.48
+-0.47
+-0.46
+-0.44
+-0.42
+-0.4
+-0.39
+-0.39
+-0.37
+-0.36
+-0.36
+-0.34
+-0.33
+-0.33
+-0.32
+-0.32
+-0.31
+-0.29
+-0.28
+-0.27
+-0.26
+-0.24
+-0.24
+-0.23
+-0.21
+-0.22
+-0.2
+-0.18
+-0.18
+-0.16
+-0.15
+-0.15
+-0.13
+-0.12
+-0.12
+-0.1
+-0.1
+-0.08
+-0.05
+-0.05
+-0.03
+-0.02
+0.0
+0.03
+0.05
+0.06
+0.07
+0.07
+0.06
+0.08
+0.08
+0.08
+0.09
+0.09
+0.11
+0.11
+0.12
+0.13
+0.15
+0.15
+0.14
+0.14
+0.13
+0.13
+0.13
+0.1
+0.1
+0.11
+0.09
+0.1
+0.11
+0.11
+0.11
+0.11
+0.11
+0.11
+0.1
+0.09
+0.09
+0.07
+0.07
+0.06
+0.05
+0.04
+0.03
+0.02
+0.01
+-0.0
+-0.01
+-0.02
+-0.03
+-0.04
+-0.05
+-0.06
+-0.07
+-0.08
+-0.09
+-0.1
+-0.12
+-0.14
+-0.15
+-0.17
+-0.18
+-0.2
+-0.21
+-0.23
+-0.24
+-0.25
+-0.26
+-0.28
+-0.3
+-0.3
+-0.31
+-0.31
+-0.33
+-0.33
+-0.33
+-0.33
+-0.32
+-0.31
+-0.3
+-0.28
+-0.27
+-0.26
+-0.25
+-0.25
+-0.24
+-0.24
+-0.24
+-0.23
+-0.23
+-0.22
+-0.22
+-0.22
+-0.21
+-0.22
+-0.22
+-0.23
+-0.22
+-0.22
+-0.2
+-0.2
+-0.18
+-0.16
+-0.17
+-0.14
+-0.13
+-0.13
+-0.12
+-0.12
+-0.12
+-0.1
+-0.1
+-0.1
+-0.09
+-0.09
+-0.09
+-0.1
+-0.11
+-0.11
+-0.12
+-0.11
+-0.11
+-0.12
+-0.11
+-0.11
+-0.12
+-0.12
+-0.13
+-0.14
+-0.13
+-0.16
+-0.16
+-0.16
+-0.17
+-0.16
+-0.17
+-0.18
+-0.19
+-0.19
+-0.2
+-0.2
+-0.21
+-0.22
+-0.23
+-0.23
+-0.24
+-0.24
+-0.24
+-0.25
+-0.25
+-0.27
+-0.28
+-0.29
+-0.3
+-0.31
+-0.31
+-0.33
+-0.33
+-0.33
+-0.35
+-0.35
+-0.34
+-0.35
+-0.35
+-0.34
+-0.34
+-0.34
+-0.34
+-0.33
+-0.32
+-0.32
+-0.3
+-0.32
+-0.31
+-0.29
+-0.29
+-0.28
+-0.26
+-0.25
+-0.23
+-0.21
+-0.21
+-0.21
+-0.2
+-0.2
+-0.2
+-0.19
+-0.2
+-0.2
+-0.21
+-0.23
+-0.23
+-0.24
+-0.25
+-0.25
+-0.27
+-0.27
+-0.29
+-0.3
+-0.3
+-0.33
+-0.33
+-0.34
+-0.35
+-0.34
+-0.35
+-0.37
+-0.37
+-0.37
+-0.38
+-0.39
+-0.38
+-0.39
+-0.39
+-0.38
+-0.4
+-0.4
+-0.4
+-0.4
+-0.42
+-0.42
+-0.44
+-0.45
+-0.44
+-0.45
+-0.44
+-0.42
+-0.42
+-0.41
+-0.4
+-0.4
+-0.4
+-0.39
+-0.39
+-0.39
+-0.39
+-0.41
+-0.4
+-0.4
+-0.4
+-0.4
+-0.38
+-0.38
+-0.37
+-0.36
+-0.35
+-0.34
+-0.32
+-0.31
+-0.3
+-0.28
+-0.26
+-0.26
+-0.25
+-0.23
+-0.21
+-0.21
+-0.2
+-0.21
+-0.18
+-0.16
+-0.16
+-0.16
+-0.15
+-0.15
+-0.14
+-0.14
+-0.14
+-0.13
+-0.12
+-0.12
+-0.11
+-0.11
+-0.12
+-0.1
+-0.1
+-0.1
+-0.09
+-0.11
+-0.11
+-0.1
+-0.1
+-0.1
+-0.08
+-0.08
+-0.07
+-0.05
+-0.05
+-0.05
+-0.05
+-0.05
+-0.05
+-0.05
+-0.06
+-0.06
+-0.06
+-0.06
+-0.07
+-0.08
+-0.08
+-0.08
+-0.09
+-0.07
+-0.06
+-0.07
+-0.06
+-0.06
+-0.06
+-0.05
+-0.06
+-0.07
+-0.06
+-0.06
+-0.07
+-0.07
+-0.06
+-0.08
+-0.07
+-0.08
+-0.09
+-0.08
+-0.08
+-0.09
+-0.07
+-0.08
+-0.07
+-0.06
+-0.04
+-0.06
+-0.05
+-0.05
+-0.04
+-0.03
+-0.03
+-0.01
+0.0
+0.01
+0.03
+0.04
+0.05
+0.07
+0.08
+0.09
+0.11
+0.12
+0.13
+0.15
+0.16
+0.17
+0.18
+0.18
+0.19
+0.2
+0.2
+0.19
+0.21
+0.19
+0.19
+0.18
+0.17
+0.16
+0.15
+0.16
+0.15
+0.16
+0.15
+0.15
+0.16
+0.16
+0.16
+0.16
+0.16
+0.16
+0.15
+0.15
+0.16
+0.15
+0.14
+0.13
+0.1
+0.09
+0.06
+0.05
+0.03
+0.01
+-0.02
+-0.04
+-0.07
+-0.09
+-0.11
+-0.12
+-0.15
+-0.17
+-0.19
+-0.21
+-0.22
+-0.23
+-0.25
+-0.26
+-0.27
+-0.28
+-0.29
+-0.3
+-0.3
+-0.31
+-0.31
+-0.32
+-0.33
+-0.34
+-0.33
+-0.35
+-0.36
+-0.38
+-0.38
+-0.38
+-0.41
+-0.44
+-0.45
+-0.47
+-0.47
+-0.48
+-0.5
+-0.51
+-0.51
+-0.53
+-0.52
+-0.54
+-0.56
+-0.57
+-0.59
+-0.6
+-0.61
+-0.62
+-0.61
+-0.62
+-0.63
+-0.62
+-0.65
+-0.65
+-0.65
+-0.68
+-0.68
+-0.69
+-0.71
+-0.71
+-0.72
+-0.72
+-0.72
+-0.72
+-0.71
+-0.73
+-0.73
+-0.73
+-0.74
+-0.75
+-0.76
+-0.77
+-0.77
+-0.78
+-0.79
+-0.79
+-0.79
+-0.79
+-0.8
+-0.79
+-0.78
+-0.77
+-0.76
+-0.75
+-0.74
+-0.73
+-0.73
+-0.72
+-0.71
+-0.71
+-0.69
+-0.69
+-0.67
+-0.65
+-0.64
+-0.63
+-0.62
+-0.62
+-0.62
+-0.62
+-0.63
+-0.63
+-0.63
+-0.64
+-0.63
+-0.62
+-0.62
+-0.61
+-0.61
+-0.61
+-0.59
+-0.59
+-0.58
+-0.57
+-0.56
+-0.53
+-0.52
+-0.5
+-0.47
+-0.45
+-0.41
+-0.38
+-0.36
+-0.34
+-0.3
+-0.28
+-0.25
+-0.22
+-0.21
+-0.17
+-0.14
+-0.12
+-0.09
+-0.07
+-0.05
+-0.03
+-0.01
+0.01
+0.02
+0.03
+0.06
+0.06
+0.07
+0.08
+0.09
+0.11
+0.11
+0.12
+0.13
+0.14
+0.14
+0.15
+0.17
+0.18
+0.19
+0.2
+0.21
+0.22
+0.24
+0.25
+0.25
+0.25
+0.25
+0.25
+0.26
+0.26
+0.25
+0.26
+0.27
+0.27
+0.29
+0.29
+0.3
+0.32
+0.32
+0.33
+0.34
+0.32
+0.31
+0.3
+0.29
+0.3
+0.29
+0.28
+0.26
+0.26
+0.26
+0.25
+0.24
+0.24
+0.24
+0.23
+0.23
+0.23
+0.23
+0.23
+0.23
+0.22
+0.22
+0.22
+0.21
+0.22
+0.23
+0.22
+0.22
+0.21
+0.19
+0.18
+0.16
+0.15
+0.14
+0.11
+0.09
+0.07
+0.04
+0.03
+0.01
+-0.01
+-0.03
+-0.05
+-0.06
+-0.07
+-0.09
+-0.11
+-0.1
+-0.12
+-0.13
+-0.12
+-0.13
+-0.14
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.13
+-0.13
+-0.13
+-0.13
+-0.13
+-0.13
+-0.13
+-0.15
+-0.15
+-0.17
+-0.17
+-0.2
+-0.21
+-0.22
+-0.23
+-0.25
+-0.27
+-0.27
+-0.3
+-0.3
+-0.31
+-0.33
+-0.33
+-0.33
+-0.34
+-0.33
+-0.34
+-0.35
+-0.34
+-0.35
+-0.36
+-0.36
+-0.37
+-0.36
+-0.36
+-0.37
+-0.37
+-0.36
+-0.37
+-0.35
+-0.38
+-0.38
+-0.38
+-0.38
+-0.39
+-0.39
+-0.38
+-0.37
+-0.37
+-0.36
+-0.35
+-0.34
+-0.34
+-0.32
+-0.34
+-0.35
+-0.35
+-0.33
+-0.34
+-0.33
+-0.31
+-0.3
+-0.3
+-0.3
+-0.31
+-0.32
+-0.33
+-0.35
+-0.36
+-0.37
+-0.37
+-0.37
+-0.38
+-0.38
+-0.37
+-0.38
+-0.39
+-0.38
+-0.38
+-0.37
+-0.38
+-0.38
+-0.37
+-0.37
+-0.36
+-0.35
+-0.34
+-0.32
+-0.32
+-0.32
+-0.29
+-0.3
+-0.3
+-0.3
+-0.3
+-0.29
+-0.3
+-0.3
+-0.3
+-0.31
+-0.3
+-0.31
+-0.3
+-0.3
+-0.32
+-0.31
+-0.32
+-0.34
+-0.34
+-0.35
+-0.37
+-0.37
+-0.38
+-0.41
+-0.4
+-0.4
+-0.4
+-0.41
+-0.42
+-0.42
+-0.42
+-0.42
+-0.43
+-0.45
+-0.45
+-0.46
+-0.46
+-0.45
+-0.45
+-0.44
+-0.42
+-0.42
+-0.41
+-0.39
+-0.39
+-0.37
+-0.37
+-0.36
+-0.34
+-0.35
+-0.33
+-0.31
+-0.3
+-0.29
+-0.28
+-0.28
+-0.26
+-0.24
+-0.23
+-0.21
+-0.19
+-0.16
+-0.13
+-0.11
+-0.07
+-0.04
+-0.02
+0.02
+0.02
+0.02
+0.01
+0.0
+-0.0
+-0.01
+-0.03
+-0.05
+-0.05
+-0.05
+-0.06
+-0.08
+-0.08
+-0.09
+-0.1
+-0.1
+-0.1
+-0.1
+-0.11
+-0.11
+-0.11
+-0.13
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.13
+-0.13
+-0.13
+-0.13
+-0.12
+-0.13
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.12
+-0.13
+-0.12
+-0.13
+-0.13
+-0.13
+-0.12
+-0.12
+-0.12
+-0.12
+-0.11
+-0.09
+-0.08
+-0.08
+-0.07
+-0.06
+-0.08
+-0.06
+-0.06
+-0.06
+-0.05
+-0.06
+-0.07
+-0.07
+-0.07
+-0.09
+-0.08
+-0.1
+-0.1
+-0.12
+-0.13
+-0.15
+-0.18
+-0.19
+-0.21
+-0.25
+-0.26
+-0.27
+-0.3
+-0.3
+-0.3
+-0.31
+-0.32
+-0.31
+-0.33
+-0.31
+-0.3
+-0.3
+-0.3
+-0.29
+-0.28
+-0.27
+-0.25
+-0.26
+-0.26
+-0.25
+-0.25
+-0.25
+-0.24
+-0.23
+-0.23
+-0.21
+-0.19
+-0.2
+-0.18
+-0.19
+-0.19
+-0.2
+-0.2
+-0.2
+-0.21
+-0.22
+-0.23
+-0.23
+-0.24
+-0.25
+-0.26
+-0.26
+-0.27
+-0.28
+-0.29
+-0.3
+-0.29
+-0.29
+-0.3
+-0.29
+-0.28
+-0.27
+-0.27
+-0.26
+-0.27
+-0.26
+-0.26
+-0.26
+-0.26
+-0.27
+-0.26
+-0.26
+-0.26
+-0.27
+-0.28
+-0.28
+-0.3
+-0.3
+-0.3
+-0.32
+-0.31
+-0.32
+-0.34
+-0.34
+-0.36
+-0.35
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.35
+-0.35
+-0.35
+-0.36
+-0.37
+-0.38
+-0.39
+-0.4
+-0.42
+-0.44
+-0.46
+-0.46
+-0.47
+-0.47
+-0.47
+-0.47
+-0.47
+-0.47
+-0.46
+-0.47
+-0.47
+-0.46
+-0.47
+-0.46
+-0.45
+-0.44
+-0.43
+-0.43
+-0.43
+-0.42
+-0.41
+-0.41
+-0.4
+-0.4
+-0.4
+-0.38
+-0.37
+-0.37
+-0.35
+-0.35
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.36
+-0.35
+-0.35
+-0.35
+-0.34
+-0.34
+-0.35
+-0.33
+-0.33
+-0.33
+-0.31
+-0.3
+-0.29
+-0.27
+-0.25
+-0.23
+-0.2
+-0.18
+-0.16
+-0.14
+-0.14
+-0.1
+-0.08
+-0.08
+-0.07
+-0.07
+-0.06
+-0.05
+-0.05
+-0.04
+-0.03
+-0.02
+-0.0
+0.01
+0.03
+0.04
+0.06
+0.07
+0.08
+0.11
+0.11
+0.11
+0.12
+0.13
+0.15
+0.16
+0.17
+0.19
+0.21
+0.23
+0.23
+0.23
+0.24
+0.24
+0.23
+0.23
+0.22
+0.21
+0.2
+0.19
+0.17
+0.14
+0.13
+0.11
+0.09
+0.07
+0.05
+0.04
+0.02
+-0.0
+-0.02
+-0.02
+-0.04
+-0.03
+-0.04
+-0.04
+-0.04
+-0.05
+-0.04
+-0.04
+-0.04
+-0.03
+-0.03
+-0.04
+-0.04
+-0.05
+-0.04
+-0.06
+-0.06
+-0.07
+-0.08
+-0.08
+-0.09
+-0.09
+-0.09
+-0.08
+-0.09
+-0.07
+-0.06
+-0.07
+-0.05
+-0.06
+-0.07
+-0.06
+-0.07
+-0.07
+-0.07
+-0.09
+-0.1
+-0.11
+-0.12
+-0.11
+-0.12
+-0.13
+-0.15
+-0.15
+-0.15
+-0.17
+-0.18
+-0.19
+-0.2
+-0.23
+-0.24
+-0.27
+-0.26
+-0.27
+-0.28
+-0.29
+-0.29
+-0.29
+-0.3
+-0.31
+-0.33
+-0.33
+-0.33
+-0.34
+-0.34
+-0.34
+-0.33
+-0.31
+-0.3
+-0.29
+-0.28
+-0.28
+-0.29
+-0.28
+-0.3
+-0.32
+-0.32
+-0.34
+-0.35
+-0.36
+-0.38
+-0.41
+-0.43
+-0.45
+-0.47
+-0.49
+-0.51
+-0.53
+-0.55
+-0.57
+-0.58
+-0.61
+-0.6
+-0.61
+-0.6
+-0.6
+-0.6
+-0.59
+-0.58
+-0.59
+-0.59
+-0.58
+-0.58
+-0.57
+-0.56
+-0.57
+-0.56
+-0.56
+-0.57
+-0.54
+-0.53
+-0.51
+-0.49
+-0.51
+-0.51
+-0.51
+-0.52
+-0.53
+-0.53
+-0.54
+-0.54
+-0.56
+-0.56
+-0.56
+-0.56
+-0.56
+-0.56
+-0.57
+-0.56
+-0.56
+-0.57
+-0.56
+-0.56
+-0.57
+-0.58
+-0.56
+-0.57
+-0.57
+-0.56
+-0.58
+-0.57
+-0.57
+-0.58
+-0.58
+-0.57
+-0.58
+-0.57
+-0.56
+-0.55
+-0.54
+-0.52
+-0.5
+-0.5
+-0.48
+-0.47
+-0.46
+-0.44
+-0.43
+-0.4
+-0.38
+-0.38
+-0.36
+-0.34
+-0.33
+-0.3
+-0.28
+-0.26
+-0.23
+-0.2
+-0.18
+-0.16
+-0.13
+-0.11
+-0.1
+-0.08
+-0.05
+-0.04
+-0.02
+-0.01
+0.01
+0.02
+0.03
+0.05
+0.06
+0.06
+0.06
+0.06
+0.06
+0.06
+0.05
+0.05
+0.05
+0.04
+0.04
+0.04
+0.05
+0.05
+0.04
+0.05
+0.05
+0.05
+0.06
+0.06
+0.07
+0.09
+0.08
+0.1
+0.1
+0.11
+0.12
+0.14
+0.14
+0.14
+0.14
+0.14
+0.14
+0.14
+0.14
+0.15
+0.14
+0.13
+0.13
+0.13
+0.13
+0.13
+0.12
+0.12
+0.11
+0.11
+0.11
+0.11
+0.1
+0.1
+0.11
+0.11
+0.12
+0.13
+0.14
+0.15
+0.15
+0.15
+0.16
+0.17
+0.17
+0.19
+0.18
+0.21
+0.2
+0.19
+0.2
+0.22
+0.21
+0.23
+0.24
+0.23
+0.26
+0.25
+0.24
+0.25
+0.23
+0.21
+0.2
+0.19
+0.16
+0.16
+0.15
+0.14
+0.14
+0.12
+0.11
+0.11
+0.1
+0.09
+0.09
+0.07
+0.07
+0.06
+0.05
+0.06
+0.05
+0.05
+0.05
+0.04
+0.04
+0.04
+0.04
+0.04
+0.05
+0.04
+0.04
+0.04
+0.03
+0.03
+0.03
+0.03
+0.03
+0.04
+0.03
+0.04
+0.04
+0.02
+0.04
+0.02
+0.02
+0.02
+0.01
+-0.0
+-0.01
+-0.02
+-0.04
+-0.05
+-0.06
+-0.07
+-0.08
+-0.1
+-0.11
+-0.1
+-0.11
+-0.12
+-0.13
+-0.14
+-0.15
+-0.16
+-0.17
+-0.17
+-0.18
+-0.18
+-0.17
+-0.18
+-0.19
+-0.18
+-0.2
+-0.2
+-0.2
+-0.21
+-0.21
+-0.23
+-0.25
+-0.27
+-0.29
+-0.32
+-0.33
+-0.36
+-0.39
+-0.41
+-0.44
+-0.45
+-0.46
+-0.48
+-0.48
+-0.5
+-0.5
+-0.5
+-0.51
+-0.51
+-0.51
+-0.51
+-0.52
+-0.55
+-0.56
+-0.56
+-0.58
+-0.59
+-0.6
+-0.61
+-0.62
+-0.61
+-0.63
+-0.64
+-0.66
+-0.66
+-0.68
+-0.7
+-0.71
+-0.71
+-0.73
+-0.73
+-0.74
+-0.74
+-0.75
+-0.77
+-0.76
+-0.78
+-0.8
+-0.81
+-0.81
+-0.82
+-0.83
+-0.84
+-0.85
+-0.84
+-0.85
+-0.86
+-0.85
+-0.85
+-0.85
+-0.85
+-0.85
+-0.85
+-0.84
+-0.84
+-0.81
+-0.8
+-0.8
+-0.78
+-0.75
+-0.75
+-0.74
+-0.73
+-0.73
+-0.72
+-0.73
+-0.74
+-0.74
+-0.74
+-0.74
+-0.74
+-0.74
+-0.73
+-0.72
+-0.72
+-0.72
+-0.72
+-0.71
+-0.7
+-0.69
+-0.68
+-0.67
+-0.66
+-0.65
+-0.64
+-0.64
+-0.62
+-0.62
+-0.62
+-0.6
+-0.61
+-0.6
+-0.58
+-0.57
+-0.55
+-0.53
+-0.51
+-0.49
+-0.46
+-0.45
+-0.43
+-0.4
+-0.4
+-0.38
+-0.38
+-0.36
+-0.35
+-0.34
+-0.33
+-0.32
+-0.31
+-0.28
+-0.27
+-0.25
+-0.23
+-0.19
+-0.18
+-0.15
+-0.12
+-0.11
+-0.08
+-0.05
+-0.02
+0.01
+0.04
+0.05
+0.08
+0.1
+0.11
+0.13
+0.17
+0.19
+0.21
+0.24
+0.26
+0.29
+0.31
+0.32
+0.33
+0.33
+0.33
+0.36
+0.35
+0.33
+0.31
+0.29
+0.28
+0.26
+0.25
+0.23
+0.22
+0.22
+0.21
+0.21
+0.21
+0.2
+0.21
+0.21
+0.2
+0.21
+0.21
+0.21
+0.21
+0.21
+0.21
+0.2
+0.2
+0.19
+0.19
+0.2
+0.21
+0.2
+0.21
+0.21
+0.21
+0.22
+0.23
+0.24
+0.26
+0.28
+0.3
+0.32
+0.32
+0.33
+0.35
+0.32
+0.33
+0.34
+0.33
+0.33
+0.34
+0.33
+0.33
+0.33
+0.33
+0.33
+0.32
+0.3
+0.28
+0.26
+0.25
+0.23
+0.22
+0.22
+0.2
+0.2
+0.2
+0.2
+0.2
+0.21
+0.22
+0.22
+0.23
+0.23
+0.24
+0.25
+0.25
+0.26
+0.26
+0.26
+0.27
+0.27
+0.27
+0.27
+0.27
+0.26
+0.25
+0.24
+0.22
+0.22
+0.21
+0.19
+0.18
+0.16
+0.14
+0.13
+0.12
+0.09
+0.09
+0.08
+0.06
+0.07
+0.05
+0.03
+0.04
+0.01
+0.02
+0.03
+0.01
+0.01
+0.0
+-0.01
+-0.02
+-0.04
+-0.05
+-0.06
+-0.08
+-0.1
+-0.11
+-0.13
+-0.16
+-0.17
+-0.21
+-0.23
+-0.24
+-0.27
+-0.3
+-0.31
+-0.34
+-0.36
+-0.36
+-0.4
+-0.41
+-0.44
+-0.46
+-0.47
+-0.47
+-0.49
+-0.49
+-0.49
+-0.5
+-0.5
+-0.51
+-0.51
+-0.51
+-0.52
+-0.52
+-0.53
+-0.55
+-0.56
+-0.58
+-0.59
+-0.61
+-0.61
+-0.61
+-0.62
+-0.62
+-0.63
+-0.63
+-0.62
+-0.62
+-0.62
+-0.62
+-0.61
+-0.61
+-0.61
+-0.61
+-0.6
+-0.61
+-0.61
+-0.6
+-0.61
+-0.6
+-0.59
+-0.59
+-0.58
+-0.58
+-0.58
+-0.57
+-0.57
+-0.56
+-0.56
+-0.56
+-0.56
+-0.57
+-0.58
+-0.57
+-0.58
+-0.59
+-0.59
+-0.61
+-0.59
+-0.6
+-0.61
+-0.59
+-0.6
+-0.6
+-0.58
+-0.58
+-0.57
+-0.57
+-0.58
+-0.55
+-0.54
+-0.54
+-0.52
+-0.51
+-0.51
+-0.48
+-0.47
+-0.45
+-0.43
+-0.4
+-0.36
+-0.36
+-0.35
+-0.34
+-0.34
+-0.32
+-0.34
+-0.33
+-0.32
+-0.33
+-0.32
+-0.31
+-0.32
+-0.29
+-0.27
+-0.26
+-0.25
+-0.22
+-0.21
+-0.19
+-0.19
+-0.19
+-0.2
+-0.2
+-0.19
+-0.2
+-0.19
+-0.21
+-0.21
+-0.21
+-0.22
+-0.22
+-0.23
+-0.24
+-0.25
+-0.26
+-0.26
+-0.27
+-0.3
+-0.28
+-0.28
+-0.27
+-0.26
+-0.25
+-0.24
+-0.21
+-0.22
+-0.22
+-0.19
+-0.19
+-0.18
+-0.17
+-0.16
+-0.14
+-0.13
+-0.11
+-0.11
+-0.12
+-0.12
+-0.11
+-0.11
+-0.09
+-0.08
+-0.07
+-0.06
+-0.03
+-0.03
+0.0
+0.03
+0.05
+0.07
+0.08
+0.09
+0.1
+0.09
+0.09
+0.09
+0.08
+0.07
+0.05
+0.03
+0.02
+0.0
+0.0
+-0.02
+-0.05
+-0.05
+-0.05
+-0.09
+-0.1
+-0.1
+-0.11
+-0.12
+-0.12
+-0.12
+-0.12
+-0.11
+-0.11
+-0.11
+-0.1
+-0.09
+-0.08
+-0.06
+-0.06
+-0.07
+-0.06
+-0.07
+-0.09
+-0.11
+-0.12
+-0.16
+-0.16
+-0.18
+-0.21
+-0.22
+-0.24
+-0.24
+-0.24
+-0.27
+-0.28
+-0.29
+-0.29
+-0.28
+-0.28
+-0.28
+-0.27
+-0.28
+-0.27
+-0.28
+-0.28
+-0.28
+-0.28
+-0.28
+-0.27
+-0.26
+-0.26
+-0.26
+-0.25
+-0.25
+-0.24
+-0.23
+-0.21
+-0.2
+-0.19
+-0.16
+-0.15
+-0.13
+-0.11
+-0.08
+-0.06
+-0.03
+-0.02
+0.0
+0.02
+0.05
+0.05
+0.06
+0.06
+0.07
+0.08
+0.07
+0.08
+0.09
+0.07
+0.08
+0.09
+0.1
+0.09
+0.1
+0.12
+0.12
+0.12
+0.12
+0.12
+0.11
+0.11
+0.09
+0.08
+0.08
+0.07
+0.07
+0.06
+0.05
+0.05
+0.06
+0.06
+0.06
+0.06
+0.06
+0.05
+0.04
+0.04
+0.03
+0.01
+0.01
+-0.01
+-0.02
+-0.02
+-0.03
+-0.03
+-0.04
+-0.05
+-0.05
+-0.06
+-0.07
+-0.08
+-0.1
+-0.11
+-0.11
+-0.13
+-0.13
+-0.15
+-0.17
+-0.17
+-0.18
+-0.19
+-0.19
+-0.2
+-0.21
+-0.22
+-0.22
+-0.24
+-0.23
+-0.23
+-0.24
+-0.22
+-0.21
+-0.21
+-0.2
+-0.2
+-0.21
+-0.2
+-0.21
+-0.2
+-0.2
+-0.21
+-0.22
+-0.21
+-0.22
+-0.22
+-0.23
+-0.25
+-0.24
+-0.25
+-0.25
+-0.25
+-0.24
+-0.24
+-0.22
+-0.2
+-0.18
+-0.17
+-0.16
+-0.15
+-0.15
+-0.15
+-0.15
+-0.15
+-0.16
+-0.16
+-0.18
+-0.2
+-0.2
+-0.22
+-0.24
+-0.25
+-0.26
+-0.27
+-0.28
+-0.29
+-0.28
+-0.3
+-0.3
+-0.3
+-0.31
+-0.32
+-0.33
+-0.33
+-0.34
+-0.34
+-0.36
+-0.36
+-0.36
+-0.37
+-0.37
+-0.36
+-0.36
+-0.36
+-0.34
+-0.34
+-0.33
+-0.31
+-0.3
+-0.29
+-0.28
+-0.27
+-0.26
+-0.27
+-0.26
+-0.26
+-0.26
+-0.26
+-0.26
+-0.26
+-0.25
+-0.24
+-0.24
+-0.23
+-0.23
+-0.22
+-0.2
+-0.2
+-0.19
+-0.2
+-0.21
+-0.21
+-0.24
+-0.25
+-0.25
+-0.28
+-0.29
+-0.32
+-0.34
+-0.35
+-0.37
+-0.39
+-0.4
+-0.42
+-0.45
+-0.46
+-0.48
+-0.49
+-0.5
+-0.52
+-0.53
+-0.56
+-0.55
+-0.56
+-0.57
+-0.57
+-0.58
+-0.59
+-0.6
+-0.59
+-0.6
+-0.6
+-0.59
+-0.6
+-0.59
+-0.59
+-0.6
+-0.58
+-0.59
+-0.58
+-0.57
+-0.56
+-0.55
+-0.54
+-0.53
+-0.52
+-0.5
+-0.51
+-0.5
+-0.47
+-0.48
+-0.46
+-0.46
+-0.45
+-0.43
+-0.43
+-0.42
+-0.41
+-0.41
+-0.41
+-0.39
+-0.39
+-0.38
+-0.36
+-0.36
+-0.34
+-0.33
+-0.32
+-0.3
+-0.29
+-0.27
+-0.25
+-0.24
+-0.21
+-0.19
+-0.17
+-0.14
+-0.12
+-0.12
+-0.09
+-0.09
+-0.09
+-0.07
+-0.06
+-0.06
+-0.06
+-0.06
+-0.05
+-0.04
+-0.04
+-0.02
+-0.01
+-0.01
+0.01
+0.02
+0.03
+0.04
+0.04
+0.04
+0.03
+0.02
+0.04
+0.04
+0.02
+0.04
+0.06
+0.05
+0.06
+0.06
+0.05
+0.06
+0.06
+0.04
+0.05
+0.05
+0.06
+0.08
+0.09
+0.08
+0.1
+0.11
+0.1
+0.1
+0.11
+0.09
+0.11
+0.11
+0.11
+0.13
+0.12
+0.13
+0.12
+0.1
+0.09
+0.08
+0.06
+0.05
+0.04
+0.03
+0.02
+0.02
+0.03
+0.03
+0.02
+0.03
+0.03
+0.02
+0.04
+0.04
+0.04
+0.05
+0.06
+0.07
+0.08
+0.09
+0.09
+0.09
+0.09
+0.09
+0.09
+0.09
+0.07
+0.08
+0.07
+0.05
+0.03
+0.03
+0.01
+0.0
+-0.01
+-0.03
+-0.03
+-0.06
+-0.04
+-0.04
+-0.05
+-0.05
+-0.05
+-0.07
+-0.07
+-0.06
+-0.08
+-0.08
+-0.08
+-0.08
+-0.08
+-0.09
+-0.11
+-0.11
+-0.12
+-0.13
+-0.14
+-0.16
+-0.17
+-0.18
+-0.2
+-0.2
+-0.23
+-0.26
+-0.25
+-0.27
+-0.28
+-0.3
+-0.32
+-0.33
+-0.35
+-0.37
+-0.38
+-0.4
+-0.41
+-0.43
+-0.44
+-0.46
+-0.48
+-0.48
+-0.5
+-0.5
+-0.51
+-0.54
+-0.55
+-0.56
+-0.58
+-0.56
+-0.57
+-0.59
+-0.59
+-0.6
+-0.6
+-0.58
+-0.59
+-0.58
+-0.59
+-0.59
+-0.58
+-0.58
+-0.58
+-0.58
+-0.58
+-0.59
+-0.59
+-0.59
+-0.62
+-0.6
+-0.61
+-0.6
+-0.61
+-0.61
+-0.61
+-0.59
+-0.59
+-0.58
+-0.56
+-0.55
+-0.54
+-0.52
+-0.51
+-0.5
+-0.47
+-0.46
+-0.42
+-0.4
+-0.38
+-0.35
+-0.32
+-0.3
+-0.27
+-0.25
+-0.24
+-0.2
+-0.19
+-0.18
+-0.15
+-0.15
+-0.13
+-0.12
+-0.12
+-0.11
+-0.11
+-0.11
+-0.09
+-0.09
+-0.1
+-0.09
+-0.1
+-0.1
+-0.11
+-0.11
+-0.11
+-0.11
+-0.11
+-0.12
+-0.11
+-0.1
+-0.11
+-0.11
+-0.09
+-0.08
+-0.05
+-0.04
+-0.01
+0.01
+0.02
+0.03
+0.05
+0.06
+0.08
+0.09
+0.12
+0.13
+0.15
+0.17
+0.16
+0.16
+0.18
+0.17
+0.19
+0.19
+0.18
+0.19
+0.19
+0.18
+0.19
+0.18
+0.19
+0.2
+0.19
+0.19
+0.19
+0.18
+0.19
+0.19
+0.17
+0.16
+0.17
+0.16
+0.18
+0.15
+0.14
+0.14
+0.13
+0.13
+0.11
+0.1
+0.09
+0.06
+0.05
+0.02
+0.0
+-0.02
+-0.05
+-0.07
+-0.09
+-0.12
+-0.12
+-0.15
+-0.16
+-0.17
+-0.19
+-0.21
+-0.24
+-0.26
+-0.28
+-0.3
+-0.32
+-0.35
+-0.36
+-0.38
+-0.39
+-0.4
+-0.41
+-0.41
+-0.42
+-0.42
+-0.43
+-0.44
+-0.44
+-0.46
+-0.47
+-0.48
+-0.5
+-0.5
+-0.52
+-0.52
+-0.53
+-0.55
+-0.55
+-0.56
+-0.56
+-0.55
+-0.56
+-0.57
+-0.56
+-0.57
+-0.56
+-0.55
+-0.55
+-0.54
+-0.51
+-0.51
+-0.5
+-0.5
+-0.49
+-0.47
+-0.48
+-0.47
+-0.47
+-0.48
+-0.47
+-0.47
+-0.47
+-0.46
+-0.46
+-0.46
+-0.46
+-0.47
+-0.47
+-0.47
+-0.47
+-0.47
+-0.47
+-0.47
+-0.47
+-0.46
+-0.47
+-0.46
+-0.46
+-0.43
+-0.42
+-0.42
+-0.39
+-0.38
+-0.37
+-0.36
+-0.33
+-0.31
+-0.3
+-0.28
+-0.27
+-0.27
+-0.24
+-0.26
+-0.25
+-0.23
+-0.22
+-0.22
+-0.19
+-0.18
+-0.17
+-0.15
+-0.13
+-0.12
+-0.09
+-0.09
+-0.07
+-0.05
+-0.05
+-0.04
+-0.01
+0.0
+0.02
+0.03
+0.05
+0.08
+0.09
+0.09
+0.09
+0.12
+0.14
+0.15
+0.16
+0.17
+0.16
+0.18
+0.19
+0.19
+0.21
+0.22
+0.24
+0.25
+0.25
+0.26
+0.25
+0.26
+0.26
+0.25
+0.25
+0.23
+0.22
+0.2
+0.19
+0.18
+0.16
+0.14
+0.12
+0.11
+0.08
+0.06
+0.04
+0.02
+0.02
+-0.01
+-0.02
+-0.02
+-0.04
+-0.05
+-0.04
+-0.06
+-0.06
+-0.05
+-0.06
+-0.07
+-0.07
+-0.09
+-0.1
+-0.11
+-0.11
+-0.12
+-0.14
+-0.13
+-0.15
+-0.16
+-0.16
+-0.15
+-0.18
+-0.18
+-0.21
+-0.23
+-0.24
+-0.25
+-0.27
+-0.3
+-0.32
+-0.34
+-0.34
+-0.35
+-0.36
+-0.38
+-0.38
+-0.38
+-0.38
+-0.39
+-0.4
+-0.4
+-0.4
+-0.41
+-0.4
+-0.42
+-0.41
+-0.4
+-0.4
+-0.38
+-0.38
+-0.37
+-0.35
+-0.34
+-0.32
+-0.3
+-0.28
+-0.28
+-0.25
+-0.24
+-0.23
+-0.21
+-0.21
+-0.19
+-0.18
+-0.18
+-0.18
+-0.18
+-0.19
+-0.19
+-0.19
+-0.2
+-0.2
+-0.21
+-0.21
+-0.21
+-0.21
+-0.23
+-0.24
+-0.25
+-0.26
+-0.26
+-0.27
+-0.28
+-0.27
+-0.29
+-0.29
+-0.28
+-0.28
+-0.28
+-0.28
+-0.29
+-0.28
+-0.27
+-0.28
+-0.28
+-0.28
+-0.3
+-0.3
+-0.3
+-0.3
+-0.32
+-0.32
+-0.33
+-0.33
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.32
+-0.33
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.34
+-0.35
+-0.34
+-0.36
+-0.36
+-0.35
+-0.37
+-0.38
+-0.39
+-0.41
+-0.43
+-0.44
+-0.46
+-0.45
+-0.46
+-0.46
+-0.46
+-0.47
+-0.48
+-0.46
+-0.47
+-0.46
+-0.46
+-0.47
+-0.47
+-0.49
+-0.51
+-0.51
+-0.53
+-0.52
+-0.51
+-0.5
+-0.47
+-0.46
+-0.44
+-0.4
+-0.4
+-0.38
+-0.36
+-0.35
+-0.34
+-0.32
+-0.32
+-0.3
+-0.29
+-0.29
+-0.27
+-0.26
+-0.26
+-0.25
+-0.25
+-0.25
+-0.27
+-0.26
+-0.26
+-0.26
+-0.26
+-0.26
+-0.26
+-0.24
+-0.23
+-0.21
+-0.18
+-0.16
+-0.15
+-0.13
+-0.12
+-0.1
+-0.09
+-0.07
+-0.06
+-0.06
+-0.05
+-0.03
+-0.02
+0.0
+0.02
+0.04
+0.05
+0.07
+0.08
+0.09
+0.11
+0.12
+0.13
+0.14
+0.15
+0.16
+0.16
+0.15
+0.15
+0.15
+0.15
+0.15
+0.15
+0.15
+0.16
+0.16
+SHAR_EOF
+  $shar_touch -am 0521114099 'wire.dat' &&
+  chmod 0644 'wire.dat' ||
+  echo 'restore of wire.dat failed'
+  shar_count="`wc -c < 'wire.dat'`"
+  test 23175 -eq "$shar_count" ||
+    echo "wire.dat: original size 23175, current size $shar_count"
+fi
+# ============= wavecov.mlab ==============
+if test -f 'wavecov.mlab' && test X"$1" != X"-c"; then
+  echo 'x - skipping wavecov.mlab (File already exists)'
+else
+  echo 'x - extracting wavecov.mlab (text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'wavecov.mlab' &&
+%% This document contains an example time series analysis where the
+%% wavelet variance, correlation, and cross-correlation are computed.
+%% Methods presented here come from Whitcher (1998), "Assessing
+%% Nonstationary Time Series Using Wavelets," and the references
+%% therein; most notably Percival and Guttorp (1994), Percival (1995),
+%% and Percival and Mofjeld (1997).
+X
+%% Permission is hereby given to The MathWorks to redistribute this
+%% software.  The software can be freely used for non-commercial
+%% purposes, and can be freely distributed for non-commercial purposes
+%% only.  The copyright is retained by the developers.  Copyright
+%% 1999 by Brandon Whitcher.
+X
+%% Whereas I don't formally maintain this software, any questions
+%% and/or comments would be appreciated.  Please contact:
+%% Brandon Whitcher
+%% EURANDOM
+%% P.O. Box 513
+%% 5600 MB Eindhoven
+%% The Netherlands
+%% whitcher@eurandom.tue.nl
+%% http://www.eurandom.tue.nl/whitcher/
+X
+%% Created: May 25, 1999
+%% MATLAB version 5.2.1.1421 
+X
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compiling C-code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+X
+%% Preliminaries
+%% -------------
+%% These are the commands I used to compile the C-code necessary for 
+%% computing the DWT and MODWT.  I think the only difference between the
+%% enclosed mexopts.sh and the default copy is adding the math library 
+%% '-lm' to the CLIBS line.
+X
+mex -v -f ./mexopts.sh dwt.c
+mex -v -f ./mexopts.sh idwt.c
+mex -v -f ./mexopts.sh modwt.c
+mex -v -f ./mexopts.sh imodwt.c
+X
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Wavelet Analysis of Univariate and Bivariate Time Series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+X
+%% Data sets from Percival (1994), "Spectral Analysis of Univariate
+%% and Bivariate Time Series."  Available from StatLib via the URL
+%% http://lib.stat.cmu.edu/datasets/saubts.
+X
+load -ascii ir.dat
+load -ascii wire.dat
+ir = ir'; wire = wire';
+subplot(2,1,1)
+plot(wire); axis tight; title('Wire Gauge')
+subplot(2,1,2)
+plot(ir); axis tight; title('Infrared Gauge')
+X
+%% Compute the MODWT for each series using the D(4) wavelet filter.
+X
+WIREmodwt = modwt_dbp(wire, 'd4', 9, 'periodic');
+IRmodwt = modwt_dbp(ir, 'd4', 9, 'periodic');
+X
+%% Impose "brick wall" boundary conditions.
+X
+WIREbrickwall = modwt_brick_wall(WIREmodwt, 'd4', length(wire));
+IRbrickwall = modwt_brick_wall(IRmodwt, 'd4', length(ir));
+X
+for i = 1:9
+X  subplot(9,1,i); plot(WIREbrickwall(:,i)); axis tight
+X  title('Level i Wavelet Coefficients')
+end
+X
+for i = 1:9
+X  subplot(9,1,i); plot(IRbrickwall(:,i)); axis tight
+X  title('Level i Wavelet Coefficients')
+end
+X
+%% Compute the wavelet variance for each series.
+X
+WIREwv = wave_var(WIREbrickwall);
+IRwv = wave_var(IRbrickwall);
+X
+%% Contrast this figure with Fig. 5 in Percival (1994).
+X
+subplot(1,1,1)
+loglog(2.^(1:9), WIREwv(1:9,1)); hold on
+loglog(2.^(1:9), WIREwv(1:9,2), '--')
+loglog(2.^(1:9), WIREwv(1:9,3), '--')
+loglog(2.^(1:9), IRwv(1:9,1), 'r')
+loglog(2.^(1:9), IRwv(1:9,2), 'r--')
+loglog(2.^(1:9), IRwv(1:9,3), 'r--'); hold off
+title('Wire versus Infrared Wave Gauge')
+xlabel('scale (1/30 seconds)')
+ylabel('wavelet variance')
+X
+%% Compute wavelet covariance between the two series.
+X
+WIREIRcov = wave_cov(WIREbrickwall, IRbrickwall);
+X
+subplot(1,1,1)
+semilogx(2.^(1:9), WIREIRcov(1:9,1)); hold on
+semilogx(2.^(1:9), WIREIRcov(1:9,2), '--')
+semilogx(2.^(1:9), WIREIRcov(1:9,3), '--'); hold off
+title('Wire versus Infrared Wave Gauge')
+xlabel('scale (1/30 seconds)')
+ylabel('wavelet covariance')
+X
+%% Compute wavelet correlation between the two series.
+X
+WIREIRcor = wave_cor(WIREbrickwall, IRbrickwall);
+X
+subplot(1,1,1)
+semilogx(2.^(1:9), WIREIRcor(1:9,1)); hold on
+semilogx(2.^(1:9), WIREIRcor(1:9,2), '--')
+semilogx(2.^(1:9), WIREIRcor(1:9,3), '--'); hold off
+title('Wire versus Infrared Wave Gauge')
+xlabel('scale (1/30 seconds)')
+ylabel('wavelet correlation')
+X
+%% Compute the wavelet cross-covariance between these series.
+X
+[WIREIRcov WIREIRlag] = wave_cross_cov(WIREbrickwall, IRbrickwall, 1024);
+X
+for i = 1:9
+X  subplot(9,1,i); plot(WIREIRlag, WIREIRcov(:,i)); axis tight
+X  title('Level i Wavelet Cross-Covariance')
+end
+X
+%% Compute the wavelet cross-correlation between these series.
+X
+[WIREIRcor WIREIRlag] = wave_cross_cor(WIREbrickwall, IRbrickwall, 1024);
+X
+for i = 1:9
+X  subplot(9,1,i); plot(WIREIRlag, WIREIRcor(:,i)); axis tight
+X  title('Level i Wavelet Cross-Correlation')
+end
+X
+SHAR_EOF
+  $shar_touch -am 0525164299 'wavecov.mlab' &&
+  chmod 0644 'wavecov.mlab' ||
+  echo 'restore of wavecov.mlab failed'
+  shar_count="`wc -c < 'wavecov.mlab'`"
+  test 4501 -eq "$shar_count" ||
+    echo "wavecov.mlab: original size 4501, current size $shar_count"
+fi
+exit 0 

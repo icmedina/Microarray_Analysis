@@ -1,0 +1,138 @@
+%% This document contains an example time series analysis where the
+%% wavelet variance, correlation, and cross-correlation are computed.
+%% Methods presented here come from Whitcher (1998), "Assessing
+%% Nonstationary Time Series Using Wavelets," and the references
+%% therein; most notably Percival and Guttorp (1994), Percival (1995),
+%% and Percival and Mofjeld (1997).
+
+%% Permission is hereby given to The MathWorks to redistribute this
+%% software.  The software can be freely used for non-commercial
+%% purposes, and can be freely distributed for non-commercial purposes
+%% only.  The copyright is retained by the developers.  Copyright
+%% 1999 by Brandon Whitcher.
+
+%% Whereas I don't formally maintain this software, any questions
+%% and/or comments would be appreciated.  Please contact:
+%% Brandon Whitcher
+%% EURANDOM
+%% P.O. Box 513
+%% 5600 MB Eindhoven
+%% The Netherlands
+%% whitcher@eurandom.tue.nl
+%% http://www.eurandom.tue.nl/whitcher/
+
+%% Created: May 25, 1999
+%% MATLAB version 5.2.1.1421 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Compiling C-code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Preliminaries
+%% -------------
+%% These are the commands I used to compile the C-code necessary for 
+%% computing the DWT and MODWT.  I think the only difference between the
+%% enclosed mexopts.sh and the default copy is adding the math library 
+%% '-lm' to the CLIBS line.
+
+mex -v -f ./mexopts.sh dwt.c
+mex -v -f ./mexopts.sh idwt.c
+mex -v -f ./mexopts.sh modwt.c
+mex -v -f ./mexopts.sh imodwt.c
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Wavelet Analysis of Univariate and Bivariate Time Series
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Data sets from Percival (1994), "Spectral Analysis of Univariate
+%% and Bivariate Time Series."  Available from StatLib via the URL
+%% http://lib.stat.cmu.edu/datasets/saubts.
+
+load -ascii ir.dat
+load -ascii wire.dat
+ir = ir'; wire = wire';
+subplot(2,1,1)
+plot(wire); axis tight; title('Wire Gauge')
+subplot(2,1,2)
+plot(ir); axis tight; title('Infrared Gauge')
+
+%% Compute the MODWT for each series using the D(4) wavelet filter.
+
+WIREmodwt = modwt_dbp(wire, 'd4', 9, 'periodic');
+IRmodwt = modwt_dbp(ir, 'd4', 9, 'periodic');
+
+%% Impose "brick wall" boundary conditions.
+
+WIREbrickwall = modwt_brick_wall(WIREmodwt, 'd4', length(wire));
+IRbrickwall = modwt_brick_wall(IRmodwt, 'd4', length(ir));
+
+for i = 1:9
+  subplot(9,1,i); plot(WIREbrickwall(:,i)); axis tight
+  title('Level i Wavelet Coefficients')
+end
+
+for i = 1:9
+  subplot(9,1,i); plot(IRbrickwall(:,i)); axis tight
+  title('Level i Wavelet Coefficients')
+end
+
+%% Compute the wavelet variance for each series.
+
+WIREwv = wave_var(WIREbrickwall);
+IRwv = wave_var(IRbrickwall);
+
+%% Contrast this figure with Fig. 5 in Percival (1994).
+
+subplot(1,1,1)
+loglog(2.^(1:9), WIREwv(1:9,1)); hold on
+loglog(2.^(1:9), WIREwv(1:9,2), '--')
+loglog(2.^(1:9), WIREwv(1:9,3), '--')
+loglog(2.^(1:9), IRwv(1:9,1), 'r')
+loglog(2.^(1:9), IRwv(1:9,2), 'r--')
+loglog(2.^(1:9), IRwv(1:9,3), 'r--'); hold off
+title('Wire versus Infrared Wave Gauge')
+xlabel('scale (1/30 seconds)')
+ylabel('wavelet variance')
+
+%% Compute wavelet covariance between the two series.
+
+WIREIRcov = wave_cov(WIREbrickwall, IRbrickwall);
+
+subplot(1,1,1)
+semilogx(2.^(1:9), WIREIRcov(1:9,1)); hold on
+semilogx(2.^(1:9), WIREIRcov(1:9,2), '--')
+semilogx(2.^(1:9), WIREIRcov(1:9,3), '--'); hold off
+title('Wire versus Infrared Wave Gauge')
+xlabel('scale (1/30 seconds)')
+ylabel('wavelet covariance')
+
+%% Compute wavelet correlation between the two series.
+
+WIREIRcor = wave_cor(WIREbrickwall, IRbrickwall);
+
+subplot(1,1,1)
+semilogx(2.^(1:9), WIREIRcor(1:9,1)); hold on
+semilogx(2.^(1:9), WIREIRcor(1:9,2), '--')
+semilogx(2.^(1:9), WIREIRcor(1:9,3), '--'); hold off
+title('Wire versus Infrared Wave Gauge')
+xlabel('scale (1/30 seconds)')
+ylabel('wavelet correlation')
+
+%% Compute the wavelet cross-covariance between these series.
+
+[WIREIRcov WIREIRlag] = wave_cross_cov(WIREbrickwall, IRbrickwall, 1024);
+
+for i = 1:9
+  subplot(9,1,i); plot(WIREIRlag, WIREIRcov(:,i)); axis tight
+  title('Level i Wavelet Cross-Covariance')
+end
+
+%% Compute the wavelet cross-correlation between these series.
+
+[WIREIRcor WIREIRlag] = wave_cross_cor(WIREbrickwall, IRbrickwall, 1024);
+
+for i = 1:9
+  subplot(9,1,i); plot(WIREIRlag, WIREIRcor(:,i)); axis tight
+  title('Level i Wavelet Cross-Correlation')
+end
+
